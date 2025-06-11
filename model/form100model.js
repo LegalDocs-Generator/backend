@@ -6,11 +6,7 @@ const formSubmissionSchema = new mongoose.Schema({
   deceasedAddress: String,
   deceasedOccupation: String,
   petitionerName: String,
-  debtAmount: Number,
-  funeralExpenses: Number,
-  mortgageEncumbrances: Number,
-  totalAmount: Number,
-  email: String, 
+  property:Number,
 }, { timestamps: true });
 
-module.exports = mongoose.model("Form2Submission", formSubmissionSchema);
+module.exports = mongoose.model("Form100Submission", formSubmissionSchema);
