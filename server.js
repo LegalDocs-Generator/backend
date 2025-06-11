@@ -35,9 +35,10 @@ connectDB();
 const userAuthRoute = require("./routes/userAuthRoute");
 const googleAuthRoute = require("./routes/userAuthRoute");
 const userProfileRoute = require("./routes/userProfileRoute");
+const formRoute = require('./routes/formRoute')
 
 app.use("/api/auth", userAuthRoute, googleAuthRoute);
-app.use("/api/user", userProfileRoute);
+app.use("/api/user", userProfileRoute,formRoute);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
