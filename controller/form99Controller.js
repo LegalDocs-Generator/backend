@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
 const { sendPdfToUser } = require("../emailService/formMail");
-const FormSubmission = require("../model/form1model");
+const FormSubmission = require("../model/form99model");
 
 const generatePDF = async (data) => {
   const {
@@ -126,7 +126,7 @@ const generatePDF = async (data) => {
   return filePath;
 };
 
-const submitForm = async (req, res) => {
+const submitForm99 = async (req, res) => {
   try {
     const data = req.body;
     const filePath = await generatePDF(data);
@@ -147,4 +147,4 @@ const submitForm = async (req, res) => {
   }
 };
 
-module.exports = { submitForm };
+module.exports = { submitForm99 };
