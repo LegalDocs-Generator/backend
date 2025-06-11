@@ -163,8 +163,7 @@ const getUserProfile = async (req, res) => {
     }
     return res.status(200).json({
       user,
-      createdFunds,
-      donations,
+      
     });
   } catch (error) {
     console.error("Error fetching profile:", error);

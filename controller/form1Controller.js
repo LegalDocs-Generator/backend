@@ -19,7 +19,9 @@ const generatePDF = async (data) => {
   const totalAmount = parseFloat(data.totalAmount || "0");
 
   // Safety validation
-  if ([debtAmount, funeralExpenses, mortgageEncumbrances, totalAmount].some(isNaN)) {
+  if (
+    [debtAmount, funeralExpenses, mortgageEncumbrances, totalAmount].some(isNaN)
+  ) {
     throw new Error("Invalid or missing numeric fields");
   }
 
@@ -44,12 +46,16 @@ const generatePDF = async (data) => {
   doc.text("IN THE HIGH COURT OF JUDICATURE AT BOMBAY", { align: "center" });
   doc.moveDown();
 
-  doc.text("TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. ", { continued: true });
+  doc.text("TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. ", {
+    continued: true,
+  });
   doc.font("Times-Bold").text(petitionNumber, { continued: true });
   doc.font("Times-Roman").text(" of 2020");
   doc.moveDown(1);
 
-  doc.text("Petition for probate of last will and testament of ", { continued: true });
+  doc.text("Petition for probate of last will and testament of ", {
+    continued: true,
+  });
   doc.font("Times-Bold").text(deceasedName, { continued: true });
   doc.font("Times-Roman").text(", resident of ", { continued: true });
   doc.font("Times-Bold").text(deceasedAddress, { continued: true });
@@ -59,7 +65,7 @@ const generatePDF = async (data) => {
   doc.moveDown();
 
   doc.font("Times-Bold").text(petitionerName, { align: "right" });
-doc.font("Times-Roman").text("Petitioner", { align: "right" });
+  doc.font("Times-Roman").text("Petitioner", { align: "right" });
 
   doc.moveDown();
 
@@ -76,18 +82,30 @@ doc.font("Times-Roman").text("Petitioner", { align: "right" });
   doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown();
 
-  doc.font("Times-Roman").text("Amount of debts due and owing from the deceased, payable by law out of estate");
+  doc
+    .font("Times-Roman")
+    .text(
+      "Amount of debts due and owing from the deceased, payable by law out of estate"
+    );
   doc.moveDown(0.2);
 
   doc.text("Amount of Funeral expenses", { continued: true });
-  doc.font("Times-Bold").text(` Rs. ${funeralExpenses.toFixed(2)}`, { align: "right" });
+  doc
+    .font("Times-Bold")
+    .text(` Rs. ${funeralExpenses.toFixed(2)}`, { align: "right" });
 
-  doc.font("Times-Roman").text("Amount of mortgage encumbrances", { continued: true });
-  doc.font("Times-Bold").text(` Rs. ${mortgageEncumbrances.toFixed(2)}`, { align: "right" });
+  doc
+    .font("Times-Roman")
+    .text("Amount of mortgage encumbrances", { continued: true });
+  doc
+    .font("Times-Bold")
+    .text(` Rs. ${mortgageEncumbrances.toFixed(2)}`, { align: "right" });
 
   doc.moveDown(1);
   doc.font("Times-Roman").text("Total", { continued: true });
-  doc.font("Times-Bold").text(` Rs. ${totalAmount.toFixed(2)}`, { align: "right" });
+  doc
+    .font("Times-Bold")
+    .text(` Rs. ${totalAmount.toFixed(2)}`, { align: "right" });
 
   doc.moveDown(1);
   doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
