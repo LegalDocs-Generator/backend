@@ -1,6 +1,6 @@
 const { transporter } = require("../config/nodemailer/nodemailer");
 
-const sendPdfToUser = async (name, toEmail, filePath, fileName = "FormDocument.pdf") => {
+const sendPdfToUser = async (name, toEmail, pdfBuffer, fileName = "FormDocument.pdf") => {
   try {
     const mailOptions = {
       from: `"LeagalDocs" <${process.env.ADMIN_EMAIL}>`,
@@ -17,7 +17,8 @@ const sendPdfToUser = async (name, toEmail, filePath, fileName = "FormDocument.p
       attachments: [
         {
           filename: fileName,
-          path: filePath,
+          content: pdfBuffer, 
+          contentType: "application/pdf",
         },
       ],
     };
