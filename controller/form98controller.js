@@ -1,6 +1,4 @@
 const puppeteer = require("puppeteer");
-const fs = require("fs");
-const path = require("path");
 const FormSubmission = require("../model/form98model");
 const { sendPdfToUser } = require("../emailService/formMail");
 
@@ -221,31 +219,32 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-  const fileName = `${Date.now()}-form98.pdf`;
-  const filePath = path.join(__dirname, "../pdfs", fileName);
-
-  await page.pdf({
-    path: filePath,
+   const pdfBuffer = await page.pdf({
     format: "A4",
     printBackground: true,
-    margin: { top: "40px", bottom: "40px", left: "50px", right: "50px" },
+    margin: {
+      top: "40px",
+      bottom: "40px",
+      left: "50px",
+      right: "50px",
+    },
   });
 
   await browser.close();
-  return filePath;
+  return pdfBuffer;
 };
 
 const submitForm98 = async (req, res) => {
   try {
     const data = req.body;
-    const filePath = await generateForm98PDF(data);
+    const pdfBuffer = await generateForm98PDF(data);
 
     await FormSubmission.create(data);
 
     await sendPdfToUser(
       req.user.fullName,
       req.user.email,
-      filePath,
+      pdfBuffer,
       "PropertyForm.pdf"
     );
 

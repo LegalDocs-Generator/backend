@@ -1,6 +1,4 @@
 const puppeteer = require("puppeteer");
-const fs = require("fs");
-const path = require("path");
 const FormSubmission = require("../model/form101model");
 const { sendPdfToUser } = require("../emailService/formMail");
 
@@ -96,11 +94,7 @@ const generateForm101PDF = async (data) => {
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-  const fileName = `${Date.now()}-form101.pdf`;
-  const filePath = path.join(__dirname, "../pdfs", fileName);
-
-  await page.pdf({
-    path: filePath,
+const pdfBuffer = await page.pdf({
     format: "A4",
     printBackground: true,
     margin: {
@@ -112,20 +106,20 @@ const generateForm101PDF = async (data) => {
   });
 
   await browser.close();
-  return filePath;
+  return pdfBuffer;
 };
 
 const submitForm101 = async (req, res) => {
   try {
     const data = req.body;
-    const filePath = await generateForm101PDF(data);
+    const pdfBuffer = await generateForm101PDF(data);
 
     await FormSubmission.create(data);
 
     await sendPdfToUser(
       req.user.fullName,
       req.user.email,
-      filePath,
+      pdfBuffer,
       "ProbateForm.pdf"
     );
 
