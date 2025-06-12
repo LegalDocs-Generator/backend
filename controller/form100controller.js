@@ -1,125 +1,131 @@
+const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
-const PDFDocument = require("pdfkit");
-const { sendPdfToUser } = require("../emailService/formMail");
 const FormSubmission = require("../model/form100model");
+const { sendPdfToUser } = require("../emailService/formMail");
 
-const generatePDF = async (data) => {
+const generateForm100PDF = async (data) => {
   const {
     petitionNumber = "",
     deceasedName = "",
     deceasedAddress = "",
     deceasedOccupation = "",
     petitionerName = "",
+    property = 0
   } = data;
 
-  const propertyAmount = parseFloat(data.property || "0");
-  const totalAmount = propertyAmount;
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: "Times New Roman", serif;
+      font-size: 12px;
+      margin: 60px;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+      text-align: right;
+    }
+    .bold {
+      font-weight: bold;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid black;
+      margin: 8px 0;
+    }
+    table {
+      width: 100%;
+      margin-top: 15px;
+    }
+    td {
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div>Schedule of trust property held by the deceased</div>
+    <div style="font-size:10px;">(Rules 374, 375 and 376)</div>
+    <br>
+    <div class="bold">Form No. 100</div>
+    <br>
+    <div class="bold">IN THE HIGH COURT OF JUDICATURE AT BOMBAY</div>
+    <br>
+  </div>
 
-  // Safety validation
-  if ([propertyAmount].some(isNaN)) {
-    throw new Error("Invalid or missing numeric fields");
-  }
+  <div>TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. <span class="bold">${petitionNumber}</span> of 2020</div>
+  <br>
+  <div>
+    Petition for probate of a will of <span class="bold">${deceasedName}</span> resident <span class="bold">${deceasedAddress}</span> having occupation of <span class="bold">${deceasedOccupation}</span>. Deceased
+  </div>
 
-  const doc = new PDFDocument({ size: "A4", margin: 70 });
-  const fileName = `${Date.now()}-form.pdf`;
-  const filePath = path.join(__dirname, `../pdfs/${fileName}`);
-  const writeStream = fs.createWriteStream(filePath);
-  doc.pipe(writeStream);
+  <br>
+  <div class="right">
+    <div class="bold">${petitionerName}</div>
+    <div>Petitioner</div>
+  </div>
 
-  doc.font("Times-Roman").fontSize(10);
-  doc.text("Schedule of trust property held by the deceased", {
-    align: "center",
+  <br><br>
+  <div class="center bold">SCHEDULE No. III</div>
+  <div class="center">Schedule of Trust Property</div>
+  <hr>
+  <div style="display: flex; justify-content: flex-end;">
+    <div>Rs.</div>&nbsp;&nbsp;<div>P</div>
+  </div>
+  <hr>
+  <br>
+
+  <div>Property held in trust for another and not beneficially or with general</div>
+  <br>
+  <table>
+    <tr>
+      <td>Power to confer a beneficial interest</td>
+      <td class="right bold">Rs. ${parseFloat(property).toFixed(2)}</td>
+    </tr>
+    <tr>
+      <td>Total</td>
+      <td class="right bold">Rs. ${parseFloat(property).toFixed(2)}</td>
+    </tr>
+  </table>
+  <hr>
+
+  <br>
+  <div>Petitioner: <span class="bold">${petitionerName}</span></div>
+</body>
+</html>`;
+
+  const browser = await puppeteer.launch({ headless: "new" });
+  const page = await browser.newPage();
+  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+  const fileName = `${Date.now()}-form100.pdf`;
+  const filePath = path.join(__dirname, "../pdfs", fileName);
+
+  await page.pdf({
+    path: filePath,
+    format: "A4",
+    printBackground: true,
+    margin: {
+      top: "40px",
+      bottom: "40px",
+      left: "50px",
+      right: "50px"
+    }
   });
-  doc.moveDown(0.3);
 
-  doc
-    .fontSize(9)
-    .fillColor("gray")
-    .text("(Rules 374, 375 and 376)", { align: "center" });
-  doc.moveDown(1);
-
-  doc.fillColor("black").fontSize(11).text("Form No. 100", { align: "center" });
-  doc.moveDown();
-  doc.text("IN THE HIGH COURT OF JUDICATURE AT BOMBAY", { align: "center" });
-  doc.moveDown();
-
-  doc.text("TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. ", {
-    continued: true,
-  });
-  doc.font("Times-Bold").text(petitionNumber, { continued: true });
-  doc.font("Times-Roman").text(" of 2020");
-  doc.moveDown(1);
-
-  doc.text("Petition for probate of last will of ", {
-    continued: true,
-  });
-  doc.font("Times-Bold").text(deceasedName, { continued: true });
-  doc.font("Times-Roman").text(", resident of ", { continued: true });
-  doc.font("Times-Bold").text(deceasedAddress, { continued: true });
-  doc.font("Times-Roman").text(", having occupation of ", { continued: true });
-  doc.font("Times-Bold").text(deceasedOccupation, { continued: true });
-  doc.font("Times-Roman").text(". Deceased");
-  doc.moveDown();
-
-  doc.font("Times-Bold").text(petitionerName, { align: "right" });
-  doc.font("Times-Roman").text("Petitioner", { align: "right" });
-
-  doc.moveDown();
-
-  doc.font("Times-Roman").text("SCHEDULE No. III", { align: "center" });
-  doc.text("Schedule of Trust Property", { align: "center" });
-  doc.moveDown(0.5);
-
-  doc.moveTo(70, doc.y).lineTo(525, doc.y).stroke();
-  doc.moveDown(0.5);
-
-  doc.text(" ", { continued: true });
-  doc.text("Rs.  ", { continued: true, align: "right", width: 60 });
-  doc.text("      P", { align: "right" });
-  doc.moveDown(0.2);
-  doc.moveTo(70, doc.y).lineTo(525, doc.y).stroke();
-  doc.moveDown();
-
-  doc
-    .font("Times-Roman")
-    .text(
-      "Property held in trust for another and not beneficially or with general "
-    );
-  doc.moveDown(0.2);
-
-  doc.text("Power to confer a beneficial intereste", { continued: true });
-  doc
-    .font("Times-Bold")
-    .text(` Rs. ${propertyAmount.toFixed(2)}`, { align: "right" });
-
-  doc.moveDown(1);
-  doc.font("Times-Roman").text("Total", { continued: true });
-  doc
-    .font("Times-Bold")
-    .text(` Rs. ${totalAmount.toFixed(2)}`, { align: "right" });
-
-  doc.moveDown(1);
-  doc.moveTo(70, doc.y).lineTo(525, doc.y).stroke();
-  doc.moveDown(1);
-
-  doc.font("Times-Roman").text("Petitioner: ", { continued: true });
-  doc.font("Times-Bold").text(petitionerName);
-
-  doc.end();
-
-  await new Promise((resolve, reject) => {
-    writeStream.on("finish", resolve);
-    writeStream.on("error", reject);
-  });
-
+  await browser.close();
   return filePath;
 };
 
 const submitForm100 = async (req, res) => {
   try {
     const data = req.body;
-    const filePath = await generatePDF(data);
+    const filePath = await generateForm100PDF(data);
 
     await FormSubmission.create(data);
 
