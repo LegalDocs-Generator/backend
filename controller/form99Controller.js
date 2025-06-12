@@ -1,135 +1,156 @@
+const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
-const PDFDocument = require("pdfkit");
-const { sendPdfToUser } = require("../emailService/formMail");
 const FormSubmission = require("../model/form99model");
+const { sendPdfToUser } = require("../emailService/formMail");
 
-const generatePDF = async (data) => {
+const generateForm99PDF = async (data) => {
   const {
     petitionNumber = "",
     deceasedName = "",
     deceasedAddress = "",
     deceasedOccupation = "",
     petitionerName = "",
+    funeralExpenses = "",
+    mortgageEncumbrances = "",
   } = data;
+  const totalAmount =
+    parseFloat(funeralExpenses) + parseFloat(mortgageEncumbrances);
 
-  const debtAmount = parseFloat(data.debtAmount || "0");
-  const funeralExpenses = parseFloat(data.funeralExpenses || "0");
-  const mortgageEncumbrances = parseFloat(data.mortgageEncumbrances || "0");
-  const totalAmount = parseFloat(data.totalAmount || "0");
-
-  // Safety validation
-  if (
-    [debtAmount, funeralExpenses, mortgageEncumbrances, totalAmount].some(isNaN)
-  ) {
-    throw new Error("Invalid or missing numeric fields");
-  }
-
-  const doc = new PDFDocument({ size: "A4", margin: 50 });
-  const fileName = `${Date.now()}-form.pdf`;
-  const filePath = path.join(__dirname, `../pdfs/${fileName}`);
-  const writeStream = fs.createWriteStream(filePath);
-  doc.pipe(writeStream);
-
-  doc.font("Times-Roman").fontSize(10);
-  doc.text("Schedule of debts of the deceased etc.", { align: "center" });
-  doc.moveDown(0.3);
-
-  doc
-    .fontSize(9)
-    .fillColor("gray")
-    .text("(Rules 374, 375 and 376)", { align: "center" });
-  doc.moveDown(1);
-
-  doc.fillColor("black").fontSize(11).text("Form No. 99", { align: "center" });
-  doc.moveDown();
-  doc.text("IN THE HIGH COURT OF JUDICATURE AT BOMBAY", { align: "center" });
-  doc.moveDown();
-
-  doc.text("TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. ", {
-    continued: true,
-  });
-  doc.font("Times-Bold").text(petitionNumber, { continued: true });
-  doc.font("Times-Roman").text(" of 2020");
-  doc.moveDown(1);
-
-  doc.text("Petition for probate of last will and testament of ", {
-    continued: true,
-  });
-  doc.font("Times-Bold").text(deceasedName, { continued: true });
-  doc.font("Times-Roman").text(", resident of ", { continued: true });
-  doc.font("Times-Bold").text(deceasedAddress, { continued: true });
-  doc.font("Times-Roman").text(", having occupation of ", { continued: true });
-  doc.font("Times-Bold").text(deceasedOccupation, { continued: true });
-  doc.font("Times-Roman").text(". Deceased");
-  doc.moveDown();
-
-  doc.font("Times-Bold").text(petitionerName, { align: "right" });
-  doc.font("Times-Roman").text("Petitioner", { align: "right" });
-
-  doc.moveDown();
-
-  doc.font("Times-Roman").text("SCHEDULE No. II", { align: "center" });
-  doc.text("Schedule of Debts, etc.", { align: "center" });
-  doc.moveDown(0.5);
-
-  doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-  doc.moveDown(0.5);
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+    font-family: Arial, sans-serif;
+            margin: 1.5cm;
+            padding: 0;
+            font-size: 13px;  
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+      text-align: right;
+    }
+    .bold {
+      font-weight: bold;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid black;
+      margin: 8px 0;
+    }
+    table {
+      width: 100%;
+      margin-top: 15px;
+    }
+    td {
+      vertical-align: top;
+    }
+      div{
+       line-height: 1.4;
+      }
+      .total{
+      margin-left:400px;
+      }
+      .amount-cell {
+      text-align: right;
+      font-weight: bold;
+      margin-right:100px;
+    }
+     
+     
+  </style>
+</head>
+<body>  
+  <div class="center">
+    <div>Schedule of debts of the deceased etc. </div>
+    <div style="font-size:11px;">(Rules 374, 375 and 376)</div>
+    <br>
+    <div >Form No. 99</div>
+    <br>
+    <div >IN THE HIGH COURT OF JUDICATURE AT BOMBAY</div>
+    <br>
+    <div>TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. <span class="bold">${petitionNumber || ".................................."}</span> of 2020</div>
+  <br>
+  </div>
 
   
-  doc.text(" ", { continued: true });
-  doc.text("Rs.  ", { continued: true, align: "right", width: 60 });
-  doc.text("      P", { align: "right" });
-  doc.moveDown(0.2);
-  doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-  doc.moveDown();
+   <div style="margin-left: 150px; ">
+        Petition for probate of a will of <span class="bold">${deceasedName || ".................................."}</span>
+        </div>
+        <div style="margin-left: 120px; ">
+      resident <span class="bold">${deceasedAddress ||".................................."}</span> having occupation of
+  <span class="bold">${deceasedOccupation || ".................................."}</span> Deceased
+</div>
 
-  doc
-    .font("Times-Roman")
-    .text(
-      "Amount of debts due and owing from the deceased, payable by law out of estate"
-    );
-  doc.moveDown(0.2);
+  <div class="right">
+    <span class="bold">${petitionerName || ".................................."}</span> Petitioner
+  </div>
 
-  doc.text("Amount of Funeral expenses", { continued: true });
-  doc
-    .font("Times-Bold")
-    .text(` Rs. ${funeralExpenses.toFixed(2)}`, { align: "right" });
+  <br>
+  <div class="center">SCHEDULE No. II</div>
+  <div class="center">Schedule of Debts, etc.</div>
+  <hr>
+  <div style="display: flex; justify-content: flex-end; gap: 60px;">
+        <div>Rs.</div>
+        <div>P</div>
+      </div>
+  <hr>
+  <br>
 
-  doc
-    .font("Times-Roman")
-    .text("Amount of mortgage encumbrances", { continued: true });
-  doc
-    .font("Times-Bold")
-    .text(` Rs. ${mortgageEncumbrances.toFixed(2)}`, { align: "right" });
+  <div>Amount of debts due and owing from the deceased, payable by law out of estate</div>
+  <table style="margin-left:30px;">
+    <tr>
+      <td >Amount of Funeral expenses</td>
+      <td class="amount-cell">Rs. ${!isNaN(parseFloat(funeralExpenses)) ? parseFloat(funeralExpenses).toFixed(2) : "0"}</td>
+    </tr>
+     <tr>
+      <td>Amount of mortgage encumbrances</td>
+      <td class="amount-cell">Rs. ${!isNaN(parseFloat(mortgageEncumbrances)) ? parseFloat(mortgageEncumbrances).toFixed(2) : "0"}</td>
+    </tr>
+    <tr>
+      <td class="total">Total</td>
+      <td class="amount-cell">Rs. ${!isNaN(parseFloat(totalAmount)) ? parseFloat(totalAmount).toFixed(2) : "0"}
+</td>
+    </tr>
+  </table>
+  <hr>
 
-  doc.moveDown(1);
-  doc.font("Times-Roman").text("Total", { continued: true });
-  doc
-    .font("Times-Bold")
-    .text(` Rs. ${totalAmount.toFixed(2)}`, { align: "right" });
+  <br>
+  <div>Petitioner: <span class="bold">${petitionerName || ".................................."}</span></div>
+</body>
+</html>`;
 
-  doc.moveDown(1);
-  doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-  doc.moveDown(1);
+  const browser = await puppeteer.launch({ headless: "new" });
+  const page = await browser.newPage();
+  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-  doc.font("Times-Roman").text("Petitioner: ", { continued: true });
-  doc.font("Times-Bold").text(petitionerName);
+  const fileName = `${Date.now()}-form99.pdf`;
+  const filePath = path.join(__dirname, "../pdfs", fileName);
 
-  doc.end();
-
-  await new Promise((resolve, reject) => {
-    writeStream.on("finish", resolve);
-    writeStream.on("error", reject);
+  await page.pdf({
+    path: filePath,
+    format: "A4",
+    printBackground: true,
+    margin: {
+      top: "40px",
+      bottom: "40px",
+      left: "50px",
+      right: "50px",
+    },
   });
 
+  await browser.close();
   return filePath;
 };
 
 const submitForm99 = async (req, res) => {
   try {
     const data = req.body;
-    const filePath = await generatePDF(data);
+    const filePath = await generateForm99PDF(data);
 
     await FormSubmission.create(data);
 
@@ -140,10 +161,17 @@ const submitForm99 = async (req, res) => {
       "ProbateForm.pdf"
     );
 
-    res.status(200).json({ msg: "Form submitted and PDF sent successfully." });
+    res.status(200).json({
+      success: true,
+      message: "Form submitted and PDF sent successfully.",
+    });
   } catch (error) {
     console.error("Error in submitForm:", error.message);
-    res.status(500).json({ msg: "Internal Server Error" });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };
 
