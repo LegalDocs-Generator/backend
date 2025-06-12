@@ -11,7 +11,7 @@ const generateForm100PDF = async (data) => {
     deceasedAddress = "",
     deceasedOccupation = "",
     petitionerName = "",
-    property = 0
+    property = 0,
   } = data;
 
   const htmlContent = `
@@ -20,9 +20,10 @@ const generateForm100PDF = async (data) => {
 <head>
   <style>
     body {
-      font-family: "Times New Roman", serif;
-      font-size: 12px;
-      margin: 60px;
+    font-family: Arial, sans-serif;
+            margin: 1.5cm;
+            padding: 0;
+            font-size: 13px;  
     }
     .center {
       text-align: center;
@@ -45,38 +46,47 @@ const generateForm100PDF = async (data) => {
     td {
       vertical-align: top;
     }
+      div{
+line-height: 1.4;
+}
+     
+     
   </style>
 </head>
 <body>
   <div class="center">
     <div>Schedule of trust property held by the deceased</div>
-    <div style="font-size:10px;">(Rules 374, 375 and 376)</div>
+    <div style="font-size:12px;">(Rules 374, 375 and 376)</div>
     <br>
-    <div class="bold">Form No. 100</div>
+    <div>Form No. 100</div>
     <br>
-    <div class="bold">IN THE HIGH COURT OF JUDICATURE AT BOMBAY</div>
+    <div >IN THE HIGH COURT OF JUDICATURE AT BOMBAY</div>
     <br>
   </div>
 
-  <div>TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. <span class="bold">${petitionNumber}</span> of 2020</div>
+  <div class="center">TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. <span class="bold">${petitionNumber || ".................................."}</span> of 2020</div>
   <br>
-  <div>
-    Petition for probate of a will of <span class="bold">${deceasedName}</span> resident <span class="bold">${deceasedAddress}</span> having occupation of <span class="bold">${deceasedOccupation}</span>. Deceased
-  </div>
+   <div style="margin-left: 150px; ">
+        Petition for probate of a will of <span class="bold">${deceasedName || ".................................."}</span>
+        </div>
+        <div style="margin-left: 120px; ">
+      resident <span class="bold">${deceasedAddress || ".................................."}</span> having occupation of
+  <span class="bold">${deceasedOccupation || ".................................."}</span> Deceased
+</div>
+  
 
-  <br>
   <div class="right">
-    <div class="bold">${petitionerName}</div>
-    <div>Petitioner</div>
+    <span class="bold">${petitionerName || ".................................."}</span> Petitioner
   </div>
 
   <br><br>
-  <div class="center bold">SCHEDULE No. III</div>
+  <div class="center ">SCHEDULE No. III</div>
   <div class="center">Schedule of Trust Property</div>
   <hr>
-  <div style="display: flex; justify-content: flex-end;">
-    <div>Rs.</div>&nbsp;&nbsp;<div>P</div>
-  </div>
+ <div style="display: flex; justify-content: flex-end; gap: 60px;">
+        <div>Rs.</div>
+        <div>P</div>
+      </div>
   <hr>
   <br>
 
@@ -85,17 +95,17 @@ const generateForm100PDF = async (data) => {
   <table>
     <tr>
       <td>Power to confer a beneficial interest</td>
-      <td class="right bold">Rs. ${parseFloat(property).toFixed(2)}</td>
+      <td class="right bold">Rs. ${!isNaN(parseFloat(property)) ? parseFloat(property).toFixed(2) : "0"}</td>
     </tr>
     <tr>
-      <td>Total</td>
-      <td class="right bold">Rs. ${parseFloat(property).toFixed(2)}</td>
+      <td class="right">Total</td>
+      <td class="right bold">Rs.  ${!isNaN(parseFloat(property)) ? parseFloat(property).toFixed(2) : "0"}</td>
     </tr>
   </table>
   <hr>
 
   <br>
-  <div>Petitioner: <span class="bold">${petitionerName}</span></div>
+  <div>Petitioner: <span class="bold">${petitionerName || ".................................."}</span></div>
 </body>
 </html>`;
 
@@ -114,8 +124,8 @@ const generateForm100PDF = async (data) => {
       top: "40px",
       bottom: "40px",
       left: "50px",
-      right: "50px"
-    }
+      right: "50px",
+    },
   });
 
   await browser.close();
@@ -136,10 +146,17 @@ const submitForm100 = async (req, res) => {
       "ProbateForm.pdf"
     );
 
-    res.status(200).json({ msg: "Form submitted and PDF sent successfully." });
+    res.status(200).json({
+      success: true,
+      message: "Form submitted and PDF sent successfully.",
+    });
   } catch (error) {
     console.error("Error in submitForm:", error.message);
-    res.status(500).json({ msg: "Internal Server Error" });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };
 

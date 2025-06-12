@@ -1,10 +1,10 @@
+const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
-const PDFDocument = require("pdfkit");
-const { sendPdfToUser } = require("../emailService/formMail");
 const FormSubmission = require("../model/form101model");
+const { sendPdfToUser } = require("../emailService/formMail");
 
-const generatePDF = async (data) => {
+const generateForm101PDF = async (data) => {
   const {
     petitionNumber = "",
     deceasedName = "",
@@ -22,91 +22,103 @@ const generatePDF = async (data) => {
     advocateFor = "",
   } = data;
 
-  const doc = new PDFDocument({ size: "A4", margin: 70 });
-  const fileName = `${Date.now()}-form.pdf`;
-  const filePath = path.join(__dirname, `../pdfs/${fileName}`);
-  const writeStream = fs.createWriteStream(filePath);
-  doc.pipe(writeStream);
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+     font-family: Arial, sans-serif;
+            margin: 1.5cm;
+            padding: 0;
+            font-size: 13px; 
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+      text-align: right;
+    }
+    .bold {
+      font-weight: bold;
+    }
+      div{
+     line-height: 1.4;
+}
+      
+      
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div>Executor’s oath</div>
+    <div style="font-size:12px;">(See rules 374)</div>
+    <br>
+    <div >Form No. 101</div>
+    <br>
+    <div >IN THE HIGH COURT OF JUDICATURE AT BOMBAY</div>
+    <br>
+  </div>
 
-  doc.font("Times-Roman").fontSize(10);
-  doc.text("Executor’s oath", { align: "center" });
-  doc.moveDown(0.3);
+  <div class="center">TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. <span class="bold">${petitionNumber || ".................................."}</span> of 2020</div>
+  <br>
 
-  doc.fontSize(9).fillColor("gray").text("(See rules 374)", { align: "center" });
-  doc.moveDown(1);
-
-  doc.fillColor("black").fontSize(11).text("Form No. 101", { align: "center" });
-  doc.moveDown();
-  doc.text("IN THE HIGH COURT OF JUDICATURE AT BOMBAY", { align: "center" });
-  doc.moveDown();
-
-  doc.text("TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. ", {
-    continued: true,
-  },{ align: "center" });
-  doc.font("Times-Bold").text(petitionNumber, { continued: true });
-  doc.font("Times-Roman").text(" of 2020");
-  doc.moveDown(1);
-
-  doc.text("Petition for probate of a will of ", { continued: true });
-  doc.font("Times-Bold").text(deceasedName, { continued: true });
-  doc.font("Times-Roman").text(", resident ", { continued: true });
-  doc.font("Times-Bold").text(deceasedAddress, { continued: true });
-  doc.font("Times-Roman").text(", having occupation of ", { continued: true });
-  doc.font("Times-Bold").text(deceasedOccupation, { continued: true });
-  doc.font("Times-Roman").text(". Deceased", { continued: true });
-  doc.moveDown(0.5);
-
-  doc.font("Times-Bold").text(`${petitionerName}`, { align: "right" });
-  doc.font("Times-Roman").text("Petitioner", { align: "right" });
-
-  doc.moveDown(1.2);
-
-  doc.font("Times-Roman").text("I, ", { continued: true });
-doc.font("Times-Bold").text(petitionerName, { continued: true });
-doc.font("Times-Roman").text(", ", { continued: true });
-doc.font("Times-Bold").text(relationWithDeeceased, { continued: true });
-doc.font("Times-Roman").text(", the Petitioner, swear in the name of God that I believe and state that the Will referred to in the petition herein and marked Exhibit “B” is the last Will and testament of ", { continued: true });
-doc.font("Times-Bold").text(deceasedName1, { continued: true });
-doc.font("Times-Roman").text(" alias ", { continued: true });
-doc.font("Times-Bold").text(deceasedName2, { continued: true });
-doc.font("Times-Roman").text(" alias ", { continued: true });
-doc.font("Times-Bold").text(deceasedName3, { continued: true });
-doc.font("Times-Roman").text(" alias ", { continued: true });
-doc.font("Times-Bold").text(deceasedName4, { continued: true });
-doc.font("Times-Roman").text(", deceased, and that I am the executor therein named and that I will faithfully administer the property and credits of the said deceased and in any way concerning his will by paying his debts and then the legacies therein bequeathed so far as the said assets will extend, and that I will make and exhibit a full and true inventory of the said property and credits in this Hon'ble Court within six months from the date of the grant to be made to me or within such further time as the said Court may from time to time appoint and also render a true account of my administration to this Hon'ble Court within one year from the same date or within such further time as the said Court may from time to time appoint.");
+  <div style="margin-left: 150px; ">
+        Petition for probate of a will of <span class="bold">${deceasedName || ".................................."}</span>
+        </div>
+        <div style="margin-left: 120px; ">
+      resident <span class="bold">${deceasedAddress || ".................................."}</span> having occupation of
+  <span class="bold">${deceasedOccupation ||".................................."}</span> Deceased
+</div>
 
 
-  doc.moveDown(1);
-  doc.text(`Sworn at ${swearingLocation}`, { continued: true });
-  doc.text(" }");
-  doc.moveDown(0.5);
+ <div class="right">
+    <span class="bold">${petitionerName || ".................................."}</span> Petitioner
+  </div>
 
-  doc.text(`this ${swornDay} Day of ${swornMonth} 2020`, { continued: true });
-  doc.text(" }");
-  doc.moveDown(2);
+  <br>
+  <div>
+ I, <span class="bold">${deceasedName || ".................................."}, ${relationWithDeeceased || ".................................."}</span>, the Petitioner,  swear in the name of God that I believe and state that the Will referred to in the petition herein and marked Exhibit “B” is the last Will and testament of <span class="bold">${deceasedName1 || ".................................."}</span> alias <span class="bold">${deceasedName2 || ".................................."}</span> alias <span class="bold">${deceasedName3 || ".................................."}</span> alias <span class="bold">${deceasedName4 || ".................................."}</span> deceased, and that I am the executor therein named  and that I will faithfully administer the property and credits of the said deceased and in any way concerning his will by paying his debts and then the legacies therein bequeathed so far as the said assets will extend, and that I will make and exhibit a full and true inventory of the said property and credits in this Hon'ble Court within six months from the date of the grant to be made to me or within such further time as the  said Court may from time to time appoint and also render a true account of my administration to this Hon'ble Court within one year from the same date or within such further time as the said Court may from time to time appoint.
+  </div>
+  <br>
+  <div>Sworn at <span class="bold">${swearingLocation ||".................................."}</span> }</div>
+  <div>this <span class="bold">${swornDay || ".........."}</span> Day of <span class="bold">${swornMonth || ".........."}</span> 2020 }</div>
+  <br>
+  <div class="right">Before Me,</div>
+  <br>
+  <div class="right">Assistant Master / Associate,</div>
+  <div class="right">High Court, Bombay</div>
+  <div>Advocate for <span class="bold">${advocateFor || ".................................."}</span></div>
+</body>
+</html>`;
 
-  doc.text("Before Me,", { align: "right" });
-  doc.moveDown();
-  doc.text("Assistant Master / Associate,", { align: "right" });
-  doc.text("High Court, Bombay", { align: "right" });
-  doc.moveDown(2);
+  const browser = await puppeteer.launch({ headless: "new" });
+  const page = await browser.newPage();
+  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-  doc.text(`Advocate for ${advocateFor}`);
+  const fileName = `${Date.now()}-form101.pdf`;
+  const filePath = path.join(__dirname, "../pdfs", fileName);
 
-  doc.end();
-
-  await new Promise((resolve, reject) => {
-    writeStream.on("finish", resolve);
-    writeStream.on("error", reject);
+  await page.pdf({
+    path: filePath,
+    format: "A4",
+    printBackground: true,
+    margin: {
+      top: "40px",
+      bottom: "40px",
+      left: "50px",
+      right: "50px",
+    },
   });
 
+  await browser.close();
   return filePath;
 };
 
 const submitForm101 = async (req, res) => {
   try {
     const data = req.body;
-    const filePath = await generatePDF(data);
+    const filePath = await generateForm101PDF(data);
 
     await FormSubmission.create(data);
 
@@ -117,10 +129,17 @@ const submitForm101 = async (req, res) => {
       "ProbateForm.pdf"
     );
 
-    res.status(200).json({ msg: "Form submitted and PDF sent successfully." });
+    res.status(200).json({
+      success: true,
+      message: "Form submitted and PDF sent successfully.",
+    });
   } catch (error) {
     console.error("Error in submitForm:", error.message);
-    res.status(500).json({ msg: "Internal Server Error" });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };
 

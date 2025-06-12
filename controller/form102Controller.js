@@ -1,10 +1,10 @@
+const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
-const PDFDocument = require("pdfkit");
-const { sendPdfToUser } = require("../emailService/formMail");
 const FormSubmission = require("../model/form102model");
+const { sendPdfToUser } = require("../emailService/formMail");
 
-const generatePDF = async (data) => {
+const generateForm102PDF = async (data) => {
   const {
     petitionNumber = "",
     deceasedName = "",
@@ -15,131 +15,155 @@ const generatePDF = async (data) => {
     witnessAge = "",
     witnessAddress = "",
     dateOfDeath = "",
-    executorOfWill = "",
     swearingLocation = "",
     swornDay = "",
     swornMonth = "",
     advocateFor = "",
   } = data;
 
-  const doc = new PDFDocument({ size: "A4", margin: 70 });
-  const fileName = `${Date.now()}-form.pdf`;
-  const filePath = path.join(__dirname, `../pdfs/${fileName}`);
-  const writeStream = fs.createWriteStream(filePath);
-  doc.pipe(writeStream);
-
-  doc.font("Times-Roman").fontSize(10);
-  doc.text("Affidavit of the attesting witness", { align: "center" });
-  doc.moveDown(0.3);
-
-  doc.fontSize(9).fillColor("gray").text("(See rules 374 and 375)", { align: "center" });
-  doc.moveDown(1);
-
-  doc.fillColor("black").fontSize(11).text("Form No. 102", { align: "center" });
-  doc.moveDown();
-  doc.text("IN THE HIGH COURT OF JUDICATURE AT BOMBAY", { align: "center" });
-  doc.moveDown();
-
-  doc.text("TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. ", { continued: true });
-  doc.font("Times-Bold").text(petitionNumber, { continued: true });
-  doc.font("Times-Roman").text(" of 2020");
-  doc.moveDown();
-
-  doc.text("Petition for probate of a will of ", { continued: true });
-  doc.font("Times-Bold").text(deceasedName, { continued: true });
-  doc.font("Times-Roman").text(", resident ", { continued: true });
-  doc.font("Times-Bold").text(deceasedAddress, { continued: true });
-  doc.font("Times-Roman").text(", having occupation of ", { continued: true });
-  doc.font("Times-Bold").text(deceasedOccupation, { continued: true });
-  doc.font("Times-Roman").text(". Deceased");
-  doc.moveDown(0.5);
-
-  doc.font("Times-Bold").text(`${petitionerName}`, { align: "right" });
-  doc.font("Times-Roman").text("Petitioner", { align: "right" });
-
-  doc.moveDown(2);
-
-  // Affidavit body
-  doc.text("I, ", { continued: true });
-  doc.font("Times-Bold").text(witnessName, { continued: true });
-  doc.font("Times-Roman").text(", aged about ", { continued: true });
-  doc.font("Times-Bold").text(witnessAge, { continued: true });
-  doc.font("Times-Roman").text(" years, residing at ", { continued: true });
-  doc.font("Times-Bold").text(witnessAddress, { continued: true });
-  doc.font("Times-Roman").text(", swear in the name of God and say as follows:-");
-  doc.moveDown();
-
-  const points = [
-    `That I knew and was well acquainted with the deceased `,
-    `That on the `,
-    `That thereupon I, this deponent and the said `,
-    `That the name and signature `,
-    `That at the time the said deceased so subscribed his name to the said will as aforesaid, `
-  ];
-
-  const subPoints = [
-    { pre: points[0], bold: deceasedName, post: " above named." },
-    { pre: points[1], bold: dateOfDeath, post: ", I was present together with ", bold2: executorOfWill, post2: ` at the house of `, bold3: deceasedName, post3: ` and we did then and there see the said deceased set and subscribe his name at foot of the testamentary paper in the English language and character, which is referred to in the petition herein and marked Exhibit “B”, and declare and publish, the same as his last Will and testament.` },
-    { pre: points[2], bold: executorOfWill, post: ` did at the request of the said deceased and in his presence and in the presence of each other all being present at the same time set and subscribe our respective names and signatures at foot of the said testamentary paper as witnesses thereto.` },
-    { pre: points[3], bold: deceasedName, post: ` subscribed at the foot of the testamentary paper as of the party executing the same is in the proper hand-writing of the said deceased and the name and signature also subscribed and written at foot of the said testamentary paper as of the parties attesting execution of the same are in the proper respective handwritings of the said `, bold2: executorOfWill, post2: ` and of me this deponent respectively.` },
-    { pre: points[4], bold: deceasedName, post: `, he was of sound and disposing mind, memory and understanding and to the best of my belief made and published the name of his free will and pleasure.` }
-  ];
-
-  subPoints.forEach((point, i) => {
-    doc.text(`${i + 1}) `, { continued: true });
-    doc.font("Times-Roman").text(point.pre, { continued: true });
-    doc.font("Times-Bold").text(point.bold, { continued: true });
-    doc.font("Times-Roman").text(point.post || "", { continued: true });
-
-    if (point.bold2) {
-      doc.font("Times-Bold").text(point.bold2, { continued: true });
-      doc.font("Times-Roman").text(point.post2 || "", { continued: true });
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+     font-family: Arial, sans-serif;
+            margin: 1.5cm;
+            padding: 0;
+            font-size: 13px;  
     }
-    if (point.bold3) {
-      doc.font("Times-Bold").text(point.bold3, { continued: true });
-      doc.font("Times-Roman").text(point.post3 || "", { continued: true });
+    .center {
+      text-align: center;
     }
+    .right {
+      text-align: right;
+    }
+    .bold {
+      font-weight: bold;
+    }
+      .left-margin{
+      margin-left:30px;
+      }
+.numbered-line {
+ margin-left:30px;
+  display: flex;
+  align-items: flex-start;
+}
 
-    doc.moveDown();
+.number {
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.text {
+  flex: 1;
+  text-align: justify;
+}
+div{
+line-height: 1.4;
+}
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div>Affidavit of the attesting witness</div>
+    <div style="font-size:12px;">(See rules 374 and 375)</div>
+    <br>
+    <div >Form No. 102</div>
+    <br>
+    <div >IN THE HIGH COURT OF JUDICATURE AT BOMBAY</div>
+    <br>
+  </div>
+
+  <div class="center">TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. <span class="bold">${petitionNumber || ".................................."}</span> of 2020</div>
+  <br>
+   <div style="margin-left: 150px; ">
+        Petition for probate of a will of <span class="bold">${deceasedName ||".................................."}</span>
+        </div>
+        <div style="margin-left: 120px; ">
+      resident <span class="bold">${deceasedAddress || ".................................."}</span> having occupation of
+  <span class="bold">${deceasedOccupation || ".................................."}</span> Deceased
+</div>
+
+  <div class="right">
+    <span class="bold">${petitionerName || ".................................."}</span> Petitioner
+  </div>
+
+  <br>
+  <div>
+   I, <span class="bold">${witnessName || ".................................."}</span>, aged about <span class="bold">${witnessAge || "................"}</span> years, residing at <span class="bold">${witnessAddress || ".................................."}</span> swear in the name of God and say as follows:-
+  </div>
+  <br>
+  <div class="numbered-line">
+  <span class="number">1)</span>
+  <span class="text"> That I knew and was well acquainted with the deceased <span class="bold">${deceasedName || ".................................."}</span>  above named</span>
+  </div>
+
+   <div class="numbered-line">
+  <span class="number">2)</span>
+  <span class="text"> That on the <span class="bold">${dateOfDeath || ".................................."}</span>, I was present together with <span class="bold">${petitionerName || ".................................."}</span> at the house of <span class="bold">${deceasedName || ".................................."}</span>  and we did then and there see the said deceased set and subscribe his name at foot of the testamentary paper in the English language and character, which is referred to in. the petition herein and marked Exhibit “B”, and declare and publish, the same as his last Will and testament.</span>
+  </div>
+
+  <div class="numbered-line">
+  <span class="number">3)</span>
+  <span class="text"> That thereupon I, this deponent and the said <span class="bold">${petitionerName || ".................................."}</span> did at the request of the said deceased and in his presence and in the presence of each other all being present at the same time set and subscribe our respective names and signatures at foot of the said testamentary paper as witnesses thereto.</span>
+  </div>
+
+  <div class="numbered-line">
+  <span class="number">4)</span>
+  <span class="text"> That the name and signature <span class="bold">${deceasedName ||".................................."}</span>  subscribed at the foot of the testamentary paper as of the party executing the same is in the proper hand-writing of the said deceased and the name and signature also subscribed and written at foot of the said testamentary paper as of the parties attesting execution of the same are in the proper respective handwritings of the said and of me this deponent respectively.</span>
+  </div>
+  
+  <div class="numbered-line">
+  <span class="number">5)</span>
+  <span class="text">
+    That at the time the said deceased so subscribed his name and signature to the said will as aforesaid,
+    <span class="bold">${deceasedName ||".................................."}</span>, he was of sound and disposing mind, memory and understanding and to the best of my belief made and published the name of his free will and pleasure.
+  </span>
+</div>
+
+
+
+  <br>
+  <br>
+  <div>Sworn at <span class="bold">${swearingLocation || ".................................."}</span> }</div>
+  <div>this <span class="bold">${swornDay || ".........."}</span> Day of <span class="bold">${swornMonth || "..........."}</span> 2020 }</div>
+  <br>
+  <div class="right">Before Me,</div>
+  <br>
+  <div class="right">Assistant Master / Associate,</div>
+  <div class="right">High Court, Bombay</div>
+  <div>Advocate for <span class="bold">${advocateFor ||".................................."}</span></div>
+</body>
+</html>`;
+
+  const browser = await puppeteer.launch({ headless: "new" });
+  const page = await browser.newPage();
+  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+  const fileName = `${Date.now()}-form102.pdf`;
+  const filePath = path.join(__dirname, "../pdfs", fileName);
+
+  await page.pdf({
+    path: filePath,
+    format: "A4",
+    printBackground: true,
+    margin: {
+      top: "40px",
+      bottom: "40px",
+      left: "50px",
+      right: "50px",
+    },
   });
 
-  // Sworn at and date section
-  doc.text("Sworn at ", { continued: true });
-  doc.font("Times-Bold").text(swearingLocation, { continued: true });
-  doc.font("Times-Roman").text(" }");
-  doc.moveDown(0.5);
-
-  doc.text("this ", { continued: true });
-  doc.font("Times-Bold").text(swornDay, { continued: true });
-  doc.font("Times-Roman").text(" Day of ", { continued: true });
-  doc.font("Times-Bold").text(swornMonth, { continued: true });
-  doc.font("Times-Roman").text(" 2020 }");
-  doc.moveDown(2);
-
-  doc.text("Before Me,", { align: "right" });
-  doc.moveDown();
-  doc.text("Assistant Master / Associate,", { align: "right" });
-  doc.text("High Court, Bombay", { align: "right" });
-  doc.moveDown(2);
-
-  doc.text("Advocate for ", { continued: true });
-  doc.font("Times-Bold").text(advocateFor);
-
-  doc.end();
-
-  await new Promise((resolve, reject) => {
-    writeStream.on("finish", resolve);
-    writeStream.on("error", reject);
-  });
-
+  await browser.close();
   return filePath;
 };
-
 
 const submitForm102 = async (req, res) => {
   try {
     const data = req.body;
-    const filePath = await generatePDF(data);
+    const filePath = await generateForm102PDF(data);
 
     await FormSubmission.create(data);
 
@@ -150,10 +174,17 @@ const submitForm102 = async (req, res) => {
       "ProbateForm.pdf"
     );
 
-    res.status(200).json({ msg: "Form submitted and PDF sent successfully." });
+    res.status(200).json({
+      success: true,
+      message: "Form submitted and PDF sent successfully.",
+    });
   } catch (error) {
     console.error("Error in submitForm:", error.message);
-    res.status(500).json({ msg: "Internal Server Error" });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };
 
