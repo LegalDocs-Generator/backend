@@ -3,50 +3,90 @@ const FormSubmission = require("../model/form98model");
 const { sendPdfToUser } = require("../emailService/formMail");
 
 const generateForm98PDF = async (data) => {
-const {
-  petitionNumber = "..................................",
-  deceasedName = "..................................",
-  deceasedAddress = "..................................",
-  deceasedOccupation = "..................................",
-  petitionerName = "..................................",
-  movableAssets = {},
-  bankAccounts = [],
-  fixedDeposits = [],
-  immovableProperty = [],
-  securities = [],
-  mutualFunds = [],
-  mutualFundsMissedDividends = [],
-  royalties = [],
-  otherAssets = {},
-  totalAssets = "..................................",
-  deductedLiabilities = "..................................",
-  netAssets = "..................................",
-} = data;
+  function sumArray(arr, key) {
+    if (!Array.isArray(arr)) return 0;
+    return arr.reduce((sum, item) => {
+      const value = parseFloat(item[key]);
+      return sum + (isNaN(value) ? 0 : value);
+    }, 0);
+  }
 
-const {
-  cashInHouse = "..................................",
-  householdGoods = "..............",
-  wearingApparel = "..............",
-  books = "..............",
-  plates = "..............",
-  jewels = "..............",
-  furniture = "..............",
-  total: movableTotal = "..............",
-} = movableAssets;
+  const {
+    petitionNumber = "..................................",
+    deceasedName = "..................................",
+    deceasedAddress = "..................................",
+    deceasedOccupation = "..................................",
+    petitionerName = "..................................",
+    movableAssets = {},
+    bankAccounts = [],
+    fixedDeposits = [],
+    immovableProperty = [],
+    debenture = [],
+    mutualFunds = [],
+    mutualFundsMissedDividends = [],
+    royalties = [],
+    otherAssets = {},
+    deductedLiabilities = "",
+  } = data;
 
-const {
-  adaniAccountNumber = "..............",
-  adaniSecurityDeposit = "..............",
-  mahanagarGPBearingBPNo = "..............",
-  mahanagarBearingCANo = "..............",
-  mahanagarSecurityDeposit = "..............",
-  mahanagarGPBPNo = "..............",
-  mahanagarCANo = "..............",
-  simCardNumber = "..............",
-} = otherAssets;
+  const {
+    cashInHouse = 0,
+    householdGoods = 0,
+    wearingApparel = 0,
+    books = 0,
+    plates = 0,
+    jewels = 0,
+    furniture = 0,
+  } = movableAssets || {};
 
+  const movableTotal =
+    parseFloat(cashInHouse || 0) +
+    parseFloat(householdGoods || 0) +
+    parseFloat(wearingApparel || 0) +
+    parseFloat(books || 0) +
+    parseFloat(plates || 0) +
+    parseFloat(jewels || 0) +
+    parseFloat(furniture || 0);
 
- const htmlContent = `<!DOCTYPE html>
+  const {
+    adaniAccountNumber = "..............",
+    adaniSecurityDeposit = "..............",
+    mahanagarGPBearingBPNo = "..............",
+    mahanagarBearingCANo = "..............",
+    mahanagarSecurityDeposit = "..............",
+    mahanagarGPBPNo = "..............",
+    mahanagarCANo = "..............",
+    simCardNumber = "..............",
+  } = otherAssets;
+
+  data.totalBankValue = sumArray(data.bankAccounts, "value");
+  data.totalFixedDepositValue = sumArray(data.fixedDeposits, "value");
+  data.totalImmovableValue = sumArray(data.immovableProperty, "value");
+  data.totalDebentureValue = sumArray(data.debenture, "value");
+  data.totalMutualFundValue = sumArray(data.mutualFunds, "currentValue");
+  data.totalMissedDividend = sumArray(
+    data.mutualFundsMissedDividends,
+    "UnclaimedAmount"
+  );
+  data.totalRoyaltiesIncome = sumArray(data.royalties, "earnedIncome");
+
+  data.totalAssets =
+    data.totalBankValue +
+    data.totalFixedDepositValue +
+    data.totalImmovableValue +
+    data.totalDebentureValue +
+    data.totalMutualFundValue +
+    data.totalMissedDividend +
+    data.totalRoyaltiesIncome;
+
+  // // If you have liabilities
+  // const funeral = parseFloat(data.funeralExpenses || 0);
+  // const mortgage = parseFloat(data.mortgageEncumbrances || 0);
+  // data.deductedLiabilities = funeral + mortgage;
+
+  data.netAssets = data.totalAssets - data.deductedLiabilities;
+
+  const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -108,32 +148,71 @@ const {
 <!-- All tables and values stay on Page 1 -->
 <div class="section-title">Cash in house, household goods, wearing apparel, books, plate, jewels</div>
 <table>
-  <tr><td>Cash in house</td><td>${cashInHouse}</td></tr>
-  <tr><td>Household Goods</td><td>${householdGoods}</td></tr>
-  <tr><td>Wearing apparel</td><td>${wearingApparel}</td></tr>
-  <tr><td>Books</td><td>${books}</td></tr>
-  <tr><td>Plates</td><td>${plates}</td></tr>
-  <tr><td>Jewel</td><td>${jewels}</td></tr>
-  <tr><td>Furniture</td><td>${furniture}</td></tr>
-  <tr class="bold"><td>Total</td><td>${movableTotal}</td></tr>
+  <tr><td>Cash in house</td><td>Rs. ${
+    !isNaN(parseFloat(cashInHouse)) ? parseFloat(cashInHouse).toFixed(2) : "0"
+  }</td></tr>
+
+  <tr><td>Household Goods</td><td>Rs. ${
+    !isNaN(parseFloat(householdGoods))
+      ? parseFloat(householdGoods).toFixed(2)
+      : "0"
+  }</td></tr>
+
+  <tr><td>Wearing apparel</td><td>Rs. ${
+    !isNaN(parseFloat(wearingApparel))
+      ? parseFloat(wearingApparel).toFixed(2)
+      : "0"
+  }</td></tr>
+
+  <tr><td>Books</td><td>Rs. ${
+    !isNaN(parseFloat(books)) ? parseFloat(books).toFixed(2) : "0"
+  }</td></tr>
+  <tr><td>Plates</td><td>Rs. ${
+    !isNaN(parseFloat(plates)) ? parseFloat(plates).toFixed(2) : "0"
+  }</td></tr>
+  <tr><td>Jewel</td><td>Rs. ${
+    !isNaN(parseFloat(jewels)) ? parseFloat(jewels).toFixed(2) : "0"
+  }</td></tr>
+  <tr><td>Furniture</td><td>Rs. ${
+    !isNaN(parseFloat(furniture)) ? parseFloat(furniture).toFixed(2) : "0"
+  }</td></tr>
+  <tr class="bold"><td>Total</td><td>Rs. ${
+    !isNaN(parseFloat(movableTotal)) ? parseFloat(movableTotal).toFixed(2) : "0"
+  }</td></tr>
 </table>
 
 <div class="section-title">Bank Accounts</div>
 <table>
   <tr><th>Bank</th><th>Account No</th><th>Current Value</th></tr>
-  ${bankAccounts?.map(account => `
-    <tr><td>${account.bankName}</td><td>${account.totalBankValue}</td><td>${account.value}</td></tr>
-  `).join('')}
-  <tr class="bold"><td colspan="2">Total</td><td>${data.bankTotal}</td></tr>
+  ${bankAccounts
+    ?.map(
+      (account) => `
+    <tr><td>${account.bankName || " "}</td><td>${
+        account.accountNumber || " "
+      }</td><td>${parseFloat(account.value || 0).toFixed(2)}</td></tr>
+  `
+    )
+    .join("")}
+  <tr class="bold"><td colspan="2">Total</td><td>${parseFloat(
+    data.totalBankValue || 0
+  ).toFixed(2)}</td></tr>
 </table>
 
 <div class="section-title">Fixed Deposits</div>
 <table>
   <tr><th>Bank</th><th>Receipt/Certificate Details</th><th>Current Value</th></tr>
-  ${fixedDeposits?.map(fd => `
-    <tr><td>${fd.bankName}</td><td>${fd.receiptDetails}</td><td>${fd.value}</td></tr>
-  `).join('')}
-  <tr class="bold"><td colspan="2">Total</td><td>${data.totalFixedDepositValue}</td></tr>
+  ${fixedDeposits
+    ?.map(
+      (fd) => `
+    <tr><td>${fd.bankName || " "}</td><td>${
+        fd.receiptDetails || " "
+      }</td><td>${parseFloat(fd.value || 0).toFixed(2)}</td></tr>
+  `
+    )
+    .join("")}
+  <tr class="bold"><td colspan="2">Total</td><td>${parseFloat(
+    data.totalFixedDepositValue || 0
+  ).toFixed(2)}</td></tr>
 </table>
 
 <div class="section-title">Government Securities—</div>
@@ -142,10 +221,18 @@ const {
 <div class="section-title">Immovable Property—</div>
 <table>
   <tr><th>Description</th><th>Assessed Value</th></tr>
-  ${immovableProperty?.map(prop => `
-    <tr><td>${prop.description}</td><td>${prop.value}</td></tr>
-  `).join('')}
-  <tr class="bold"><td>Total</td><td>${data.totalImmovableValue}</td></tr>
+  ${immovableProperty
+    ?.map(
+      (prop) => `
+    <tr><td>${prop.description || " "}</td><td>${parseFloat(
+        prop.value || 0
+      ).toFixed(2)}</td></tr>
+  `
+    )
+    .join("")}
+  <tr class="bold"><td>Total</td><td>${parseFloat(
+    data.totalImmovableValue || 0
+  ).toFixed(2)}</td></tr>
 </table>
 
 <div class="section-title">Leasehold Property—</div>
@@ -162,48 +249,92 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
 
 <div class="section-title">Debenture/Bond</div>
 <table>
-  <tr><td>${data.description || ""}</td></tr>
-  <tr class="bold"><td>Total</td><td>${data.value || ""}</td></tr>
+  ${debenture
+    ?.map(
+      (prop) => `
+    <tr><td>${prop.description || " "}</td><td>${parseFloat(
+        prop.value || 0
+      ).toFixed(2)}</td></tr>
+  `
+    )
+    .join("")}
+  <tr class="bold"><td>Total</td><td>${parseFloat(
+    data.totalDebentureValue || 0
+  ).toFixed(2)}</td></tr>
 </table>
 
 
 <div class="section-title">Mutual Funds</div>
 <table>
   <tr><th>Folio</th><th>Scheme Name</th><th>Current units</th><th>Current NAV (Rs.)</th><th>Current value (Rs.)</th></tr>
-  ${data.mutualFunds?.map(mf => `
-    <tr><td>${mf.folio}</td><td>${mf.schemeName}</td><td>${mf.currentUnits}</td><td>${mf.currentNav}</td><td>${mf.currentValue}</td></tr>
-  `).join('')}
+  ${mutualFunds
+    ?.map(
+      (mf) => `
+    <tr><td>${mf.folio}</td><td>${mf.schemeName}</td><td>${
+        mf.currentUnits
+      }</td><td> ${parseFloat(mf.currentNav || 0).toFixed(
+        2
+      )}</td><td>${parseFloat(mf.currentValue || 0).toFixed(2)}</td></tr>
+  `
+    )
+    .join("")}
 </table>
 
 <div  class="yellow">Mutual Fund Missed Dividends</div>
 <table>
   <tr><th>Folio</th><th>Unclaimed Scheme</th><th>Unclaimed Amount (Rs.)</th></tr>
-  ${data.missedDividends?.map(div => `
-    <tr><td>${div.folio}</td><td>${div.UnclaimedSchemeName}</td><td>${div.UnclaimedAmount}</td></tr>
-  `).join('')}
+  ${mutualFundsMissedDividends
+    ?.map(
+      (div) => `
+    <tr><td>${div.folio}</td><td>${
+        div.UnclaimedSchemeName
+      }</td><td>${parseFloat(div.UnclaimedAmount || 0).toFixed(2)}</td></tr>
+  `
+    )
+    .join("")}
 </table>
 
 <div class="section-title">Royalties / Fees from Sale of Books</div>
 <table>
   <tr><th>Sr No</th><th>Book Name</th><th>Earned Income</th></tr>
-  ${data.royalties?.map((royalty, index) => `
-    <tr><td>${index + 1}</td><td>${royalty.bookName}</td><td>${royalty.earnedIncome}</td></tr>
-  `).join('')}
-  <tr class="bold"><td>Total</td><td>${data.totalRoyaltiesIncome}</td></tr>
+  ${royalties
+    ?.map(
+      (royalty, index) => `
+    <tr><td>${index + 1}</td><td>${royalty.bookName}</td><td>${parseFloat(
+        royalty.earnedIncome || 0
+      ).toFixed(2)}</td></tr>
+  `
+    )
+    .join("")}
+  <tr class="bold"><td colspan="2">Total</td><td>${parseFloat(
+    data.totalRoyaltiesIncome || 0
+  ).toFixed(2)}</td></tr>
 </table>
 
 <div class="section-title">Other Assets:</div>
 <ol>
-  <li>Adani Electricity Account Number: ${adaniAccountNumber || "............."}</li>
-  <li>Security Deposit of ${adaniSecurityDeposit || "............."} or Adani Electricity Account Number  ${adaniAccountNumber || "............."}</li>
-  <li>Mahanagar Gas connection bearing BP No. : ${mahanagarGPBearingBPNo || "............."} / CA No.: ${mahanagarBearingCANo || "............."}</li>
-  <li>Security Deposit of Rs ${mahanagarSecurityDeposit || "............."}for Mahanagar Gas connection BP No. : ${mahanagarGPBPNo || "............."} / CA No. :  ${mahanagarCANo || "............."} </li>
+  <li>Adani Electricity Account Number: ${
+    adaniAccountNumber || "............."
+  }</li>
+  <li>Security Deposit of ${
+    adaniSecurityDeposit || "............."
+  } or Adani Electricity Account Number  ${
+    adaniAccountNumber || "............."
+  }</li>
+  <li>Mahanagar Gas connection bearing BP No. : ${
+    mahanagarGPBearingBPNo || "............."
+  } / CA No.: ${mahanagarBearingCANo || "............."}</li>
+  <li>Security Deposit of Rs ${
+    mahanagarSecurityDeposit || "............."
+  }for Mahanagar Gas connection BP No. : ${
+    mahanagarGPBPNo || "............."
+  } / CA No. :  ${mahanagarCANo || "............."} </li>
   <li>SIM Card Number: ${simCardNumber || "............."}</li>
 </ol>
 
-<div class="right">Total:-${totalAssets}</span></div>
+<div class="right">Total:-${data.totalAssets}</span></div>
 <div class="right">Deduct Amount shown in Schedule No II., not subject to any Duty:-  <span>${deductedLiabilities}</span></div>
-<div class="right">Net Total:- <span>${netAssets}</span></div>
+<div class="right">Net Total:- <span>${data.netAssets}</span></div>
 
 
 <div style="text-align: left; margin-top: auto; margin-bottom: 0;">
@@ -213,13 +344,11 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
 </body>
 </html>`;
 
-
-
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-   const pdfBuffer = await page.pdf({
+  const pdfBuffer = await page.pdf({
     format: "A4",
     printBackground: true,
     margin: {

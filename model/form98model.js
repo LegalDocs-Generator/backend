@@ -15,7 +15,6 @@ const formSubmissionSchema = new mongoose.Schema(
       plates: Number,
       jewels: Number,
       furniture: Number,
-      total: Number,
     },
     bankAccounts: [
       {
@@ -37,7 +36,7 @@ const formSubmissionSchema = new mongoose.Schema(
         value: Number,
       },
     ],
-    securities: [
+    debenture: [
       {
         description: String,
         value: Number,
@@ -80,10 +79,10 @@ const formSubmissionSchema = new mongoose.Schema(
     totalBankValue: Number,
     totalFixedDepositValue: Number,
     totalImmovableValue: Number,
-    totalSecuritiesValue: Number,
-    // totalMutualFundValue: Number,
+    totalDebentureValue: Number,
+    totalMutualFundValue: Number,
     totalRoyaltiesIncome: Number,
-    // totalMissedDividend: Number,
+    totalMissedDividend: Number,
 
     totalAssets: Number,
     deductedLiabilities: Number,
@@ -91,36 +90,6 @@ const formSubmissionSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-
-
-formSubmissionSchema.pre("save", function (next) {
-  // Helper function to calculate sum
-  const sumArray = (arr, key) =>
-    Array.isArray(arr) ? arr.reduce((acc, item) => acc + (item[key] || 0), 0) : 0;
-
-  this.totalBankValue = sumArray(this.bankAccounts, "value");
-  this.totalFixedDepositValue = sumArray(this.fixedDeposits, "value");
-  this.totalImmovableValue = sumArray(this.immovableProperty, "value");
-  this.totalSecuritiesValue = sumArray(this.securities, "value");
-  // this.totalMutualFundValue = sumArray(this.mutualFunds, "currentValue");
-  this.totalRoyaltiesIncome = sumArray(this.royalties, "earnedIncome");
-  // this.totalMissedDividend = sumArray(this.mutualFundsMissedDividends, "UnclaimedAmount");
-
-  // Optional: Automatically calculate totalAssets and netAssets
-  this.totalAssets =
-    (this.movableAssets?.total || 0) +
-    this.totalBankValue +
-    this.totalFixedDepositValue +
-    this.totalImmovableValue +
-    this.totalSecuritiesValue +
-    this.totalMutualFundValue +
-    this.totalRoyaltiesIncome;
-
-  this.netAssets = this.totalAssets - (this.deductedLiabilities || 0);
-
-  next();
-});
 
 
 module.exports = mongoose.model("Form98Submission", formSubmissionSchema);
