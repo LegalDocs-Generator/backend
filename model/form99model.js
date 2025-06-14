@@ -10,4 +10,4 @@ const formSubmissionSchema = new mongoose.Schema({
   mortgageEncumbrances: Number,
 }, { timestamps: true });
 
-module.exports = mongoose.model("FormSubmission", formSubmissionSchema);
+module.exports = mongoose.model("Form99Submission", formSubmissionSchema);

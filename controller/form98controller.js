@@ -374,7 +374,7 @@ const submitForm98 = async (req, res) => {
       req.user.fullName,
       req.user.email,
       pdfBuffer,
-      "PropertyForm.pdf"
+      "Form_98.pdf"
     );
 
     res.status(200).json({
