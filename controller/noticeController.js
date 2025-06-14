@@ -75,10 +75,10 @@ const generateNoticePDF = async (data) => {
       <span class="bold">${data.petitionerFullName || ".................................."}</span>  age of <span class="bold">${data.petitionerage || ".................................."}</span> <span class="right">  )</span>
     </div>
 
-    <div>Domicile: <span class="bold">${data.petitionerDomicile || "....................."}</span> Nationality:  <span class="bold">${data.petitionerNationality || "......................."}</span> <span class="right">)</span>
+    <div>Domicile: <span class="bold">${data.petitionerDomicile || "....................."}</span> Nationality:  <span class="bold">${data.petitionerNationality || "....................."}</span> <span class="right">)</span>
     </div>
 
-    <div>Occupation: <span class="bold">${data.petitionerOccupation || ".........................."}</span> Address:  <span class="bold">${data.petitionerFullAddress || ".........................."}</span> <span class="right">)</span>
+    <div>Occupation: <span class="bold">${data.petitionerOccupation || "....................."}</span> Address:  <span class="bold">${data.petitionerFullAddress || "....................."}</span> <span class="right">)</span>
     </div>
 
     <div class="bold">
