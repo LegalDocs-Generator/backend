@@ -26,7 +26,6 @@ const generateForm98PDF = async (data) => {
     mutualFundsMissedDividends = [],
     royalties = [],
     otherAssets = {},
-    deductedLiabilities = "",
   } = data;
 
   const {
@@ -83,8 +82,11 @@ const generateForm98PDF = async (data) => {
   // const funeral = parseFloat(data.funeralExpenses || 0);
   // const mortgage = parseFloat(data.mortgageEncumbrances || 0);
   // data.deductedLiabilities = funeral + mortgage;
+  const totalAssets = parseFloat(data.totalAssets) || 0;
+const deductedLiabilities = parseFloat(data.deductedLiabilities) || 0;
 
-  data.netAssets = data.totalAssets - data.deductedLiabilities;
+data.netAssets = totalAssets - deductedLiabilities;
+
 
   const htmlContent = `<!DOCTYPE html>
 <html>
