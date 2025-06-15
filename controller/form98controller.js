@@ -82,7 +82,7 @@ const generateForm98PDF = async (data) => {
   // const funeral = parseFloat(data.funeralExpenses || 0);
   // const mortgage = parseFloat(data.mortgageEncumbrances || 0);
   // data.deductedLiabilities = funeral + mortgage;
-  const totalAssets = parseFloat(data.totalAssets) || 0;
+const totalAssets = parseFloat(data.totalAssets) || 0;
 const deductedLiabilities = parseFloat(data.deductedLiabilities) || 0;
 
 data.netAssets = totalAssets - deductedLiabilities;
@@ -95,7 +95,7 @@ data.netAssets = totalAssets - deductedLiabilities;
     body {
       font-family: Arial, sans-serif;
       margin: 1.5cm;
-      font-size: 13px;
+      font-size: 15px;
       position: relative;
     }
     .center { text-align: center; }
@@ -105,14 +105,7 @@ data.netAssets = totalAssets - deductedLiabilities;
     td, th { padding: 3px; border: 1px dotted black; vertical-align: top; }
     .section-title { font-weight: bold; margin-top: 20px; }
     .page-break { page-break-before: always; }
-    .yellow {
-         background: yellow;
-        font-size: 14px;
-        margin-left: 5px;
-       font-weight: bold; 
-       margin-top: 20px;
-       display: flex;
-}
+    .yellow { margin-bottom: 10px; background: yellow; font-size: 14px; margin-left: 5px; font-weight: bold; margin-top: 20px; display: inline-flex;  width: fit-content;     padding: 2px 6px;      }
 
   </style>
 </head>
@@ -356,8 +349,8 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
     margin: {
       top: "40px",
       bottom: "40px",
-      left: "50px",
-      right: "50px",
+      left: "25px",
+      right: "25px",
     },
   });
 
