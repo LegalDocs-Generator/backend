@@ -29,7 +29,7 @@ const generateForm101PDF = async (data) => {
      font-family: Arial, sans-serif;
             margin: 1.5cm;
             padding: 0;
-            font-size: 13px; 
+            font-size: 15px; 
     }
     .center {
       text-align: center;
@@ -100,8 +100,8 @@ const pdfBuffer = await page.pdf({
     margin: {
       top: "40px",
       bottom: "40px",
-      left: "50px",
-      right: "50px",
+      left: "40px",
+      right: "40px",
     },
   });
 

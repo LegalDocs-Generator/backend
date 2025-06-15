@@ -38,7 +38,7 @@ const generateForm99PDF = async (data) => {
     hr {
       border: none;
       border-top: 1px solid black;
-      margin: 8px 0;
+  
     }
     table {
       width: 100%;
@@ -132,8 +132,8 @@ const generateForm99PDF = async (data) => {
     margin: {
       top: "40px",
       bottom: "40px",
-      left: "50px",
-      right: "50px",
+      left: "40px",
+      right: "40px",
     },
   });
 
