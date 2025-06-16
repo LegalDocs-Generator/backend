@@ -16,6 +16,7 @@ const generateForm102PDF = async (data) => {
     swearingLocation = "",
     swornDay = "",
     swornMonth = "",
+    swornYear = "",
     advocateFor = "",
   } = data;
 
@@ -125,7 +126,7 @@ line-height: 1.4;
   <br>
   <br>
   <div>Sworn at <span class="bold">${swearingLocation || ".................................."}</span> }</div>
-  <div>this <span class="bold">${swornDay || ".........."}</span> Day of <span class="bold">${swornMonth || "..........."}</span> 2020 }</div>
+  <div>this <span class="bold">${swornDay || ".........."}</span> Day of <span class="bold">${swornMonth || "..........."} ${swornYear || "..........."}</span>  }</div>
   <br>
   <div class="right">Before Me,</div>
   <br>

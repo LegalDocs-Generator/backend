@@ -10,10 +10,11 @@ const formSubmissionSchema = new mongoose.Schema(
     witnessName: String,
     witnessAge: Number,
     witnessAddress: String,
-    dateOfDeath: String,
+    dateOfDeath: date,
     swearingLocation: String,
     swornDay: Number,
     swornMonth: String,
+    SwornYear:Number,
     advocateFor: String,
   },
   { timestamps: true }
