@@ -27,7 +27,6 @@ const signup = async (req, res) => {
 
     const newUserData = {
       fullName,
-      phone,
       email,
       password: hashedPassword,
       profilePhoto,

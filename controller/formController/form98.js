@@ -26,7 +26,7 @@ const submitForm98 = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        message: "Form submitted and PDF sent successfully.",
+        message: "Form saved successfully.",
       });
     }
   } catch (error) {

@@ -46,7 +46,7 @@ app.use(
   checkForAuthenticationCookie("token"),
   userProfileRoute,
   formRoute,
-   generateFormRoute
+  generateFormRoute
 );
 
 app.listen(PORT, () => {

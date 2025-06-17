@@ -16,11 +16,11 @@ router.post("/forms/submit-form97", submitForm97);
 
 
 router.get("/forms/form97", getForm97);
-router.get("/forms/form97", getForm98);
-router.get("/forms/form97", getForm99);
-router.get("/forms/form97", getForm100);
-router.get("/forms/form97", getForm101);
-router.get("/forms/form97", getForm102);
+router.get("/forms/form98", getForm98);
+router.get("/forms/form99", getForm99);
+router.get("/forms/form100", getForm100);
+router.get("/forms/form101", getForm101);
+router.get("/forms/form102", getForm102);
 
 
 
