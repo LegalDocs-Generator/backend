@@ -1,7 +1,13 @@
 const mongoose = require("mongoose");
 
-const formSubmissionSchema = new mongoose.Schema(
+const form98Schema = new mongoose.Schema(
   {
+    userId: {
+  type: mongoose.Schema.Types.ObjectId, 
+  required: true,
+  unique: true
+},
+
     petitionNumber: Number,
     deceasedName: String,
     deceasedAddress: String,
@@ -91,5 +97,5 @@ const formSubmissionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
-module.exports = mongoose.model("Form98Submission", formSubmissionSchema);
+const Form98 = mongoose.model("form98", form98Schema);
+module.exports = Form98;

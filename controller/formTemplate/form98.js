@@ -1,6 +1,5 @@
 const puppeteer = require("puppeteer");
-const FormSubmission = require("../model/form98model");
-const { sendPdfToUser } = require("../emailService/formMail");
+
 
 const generateForm98PDF = async (data) => {
   function sumArray(arr, key) {
@@ -365,32 +364,6 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
   return pdfBuffer;
 };
 
-const submitForm98 = async (req, res) => {
-  try {
-    const data = req.body;
-    const pdfBuffer = await generateForm98PDF(data);
 
-    await FormSubmission.create(data);
 
-    await sendPdfToUser(
-      req.user.fullName,
-      req.user.email,
-      pdfBuffer,
-      "Form_98.pdf"
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Form submitted and PDF sent successfully.",
-    });
-  } catch (error) {
-    console.error("Error in submitForm:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-module.exports = { submitForm98 };
+module.exports = { generateForm98PDF };

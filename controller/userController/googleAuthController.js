@@ -6,8 +6,8 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 const qs = require("querystring");
-const User = require("../models/userModel");
-const setTokenCookie = require("../authService/setTokenCookie");
+const setTokenCookie = require("../../authService/setTokenCookie");
+const User = require("../../model/userModel");
 
 const redirectToGoogle = (req, res) => {
   const googleAuthURL =

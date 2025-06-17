@@ -1,6 +1,5 @@
 const puppeteer = require("puppeteer");
-const FormSubmission = require("../model/form102model");
-const { sendPdfToUser } = require("../emailService/formMail");
+
 
 const generateForm102PDF = async (data) => {
   const {
@@ -154,32 +153,6 @@ line-height: 1.4;
   return pdfBuffer;
 };
 
-const submitForm102 = async (req, res) => {
-  try {
-    const data = req.body;
-    const pdfBuffer = await generateForm102PDF(data);
 
-    await FormSubmission.create(data);
 
-    await sendPdfToUser(
-      req.user.fullName,
-      req.user.email,
-      pdfBuffer,
-      "Form_102.pdf"
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Form submitted and PDF sent successfully.",
-    });
-  } catch (error) {
-    console.error("Error in submitForm:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-module.exports = { submitForm102 };
+module.exports = { generateForm102PDF };

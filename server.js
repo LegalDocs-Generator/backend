@@ -32,13 +32,22 @@ app.use(express.urlencoded({ extended: false }));
 const connectDB = require("./config/mongoDBConnection/db");
 connectDB();
 
-const userAuthRoute = require("./routes/userAuthRoute");
-const googleAuthRoute = require("./routes/userAuthRoute");
-const userProfileRoute = require("./routes/userProfileRoute");
-const formRoute = require('./routes/formRoute')
+const userAuthRoute = require('./routes/userRoute/userAuthRoute');
+const userProfileRoute = require('./routes/userRoute/userProfileRoute');
+const formRoute  = require('./routes/formRoute/formRoute');
+const generateFormRoute = require('./routes/generateRoute/generateFormRoute')
+const googleAuthRoute = require('./routes/userRoute/googleAuthRoute');
+
+const checkForAuthenticationCookie = require("./authMiddleware/authMiddleware");
 
 app.use("/api/auth", userAuthRoute, googleAuthRoute);
-app.use("/api/user", userProfileRoute,formRoute);
+app.use(
+  "/api/user",
+  checkForAuthenticationCookie("token"),
+  userProfileRoute,
+  formRoute,
+   generateFormRoute
+);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

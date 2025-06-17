@@ -1,6 +1,7 @@
 const express = require("express");
-const { signup, login, handleLogout, forgotPassword, handleResetPassword } = require("../controller/userController");
-const upload = require("../authMiddleware/cloundinaryUpload");
+
+const upload = require("../../authMiddleware/cloundinaryUpload");
+const { signup, login, handleLogout, forgotPassword, handleResetPassword } = require("../../controller/userController/userController");
 const router = express.Router();
 
 router.post("/signup",  upload.single("profilePhoto"),signup);

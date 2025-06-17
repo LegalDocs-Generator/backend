@@ -1,8 +1,6 @@
 const puppeteer = require("puppeteer");
-const NoticeSubmission = require("../model/noticeModel");
-const { sendPdfToUser } = require("../emailService/formMail");
 
-const generateNoticePDF = async (data) => {
+const generateForm97PDF = async (data) => {
  const personsHtml = Array.isArray(data.person)
   ? data.person
       .map(
@@ -248,34 +246,7 @@ I, <span class="bold">${data.petitionerFullName || "............................
   return pdfBuffer;
 };
 
-module.exports = generateNoticePDF;
 
-const submitNotice = async (req, res) => {
-  try {
-    const data = req.body;
-    const pdfBuffer = await generateNoticePDF(data);
 
-    await NoticeSubmission.create(data);
 
-    await sendPdfToUser(
-      req.user.fullName,
-      req.user.email,
-      pdfBuffer,
-      "Notice.pdf"
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Form submitted and PDF sent successfully.",
-    });
-  } catch (error) {
-    console.error("Error in submitForm:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-module.exports = { submitNotice };
+module.exports = { generateForm97PDF };

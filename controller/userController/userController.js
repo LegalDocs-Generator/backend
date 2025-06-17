@@ -1,15 +1,15 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../model/userModel");
-const setTokenCookie = require("../authService/setTokenCookie");
-const { createToken } = require("../authService/authService");
-const clearTokenCookie = require("../authService/clearCookie");
-const { sendResetPassword } = require("../emailService/userAuthEmail");
+const User = require("../../model/userModel");
+const setTokenCookie = require("../../authService/setTokenCookie");
+const { createToken } = require("../../authService/authService");
+const clearTokenCookie = require("../../authService/clearCookie");
+const { sendResetPassword } = require("../../emailService/userAuthEmail");
 
 
 const signup = async (req, res) => {
-  const { fullName, phone, email, password } = req.body;
-  if (!fullName || !email || !password || !phone) {
+  const { fullName,email, password } = req.body;
+  if (!fullName || !email || !password) {
     return res.json({ success: false, message: "All fields are required" });
   }
   const profilePhoto = req.file ? req.file.path : null;
