@@ -245,8 +245,4 @@ I, <span class="bold">${data.petitionerFullName || "............................
   await browser.close();
   return pdfBuffer;
 };
-
-
-
-
 module.exports = { generateForm97PDF };
