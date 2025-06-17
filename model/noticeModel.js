@@ -8,18 +8,21 @@ const noticeSchema = new mongoose.Schema({
   deceasedFullName: String,
   deceasedNationality: String,
   deceasedAddress: String,
-  deceasedsect: String, // if deceased is muslim
+  deceasedsect: String, 
+  deceasedReligion: String,
   deceasedMaritalStatus: {
   type: String,
   enum: ["Married", "Unmarried", "Widowed", "Divorced", "Separated"],
 },
   deceasedOccupation: String,
   deceasedRescidenceAtTimeOfDeath: String,
-  isDeceasedBachelor:Boolean,
-  isDeceasedspinster:Boolean,
   deceasedDeathDate:Number,
   deceasedDeathMonth:String,
   deceasedDeathYear:Number,
+  deceasedstatus:{
+    type:String,
+    enum:["bachelor","spinster"]
+  },
 
 
   exhibitNumber1: String,
