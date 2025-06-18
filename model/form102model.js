@@ -16,10 +16,11 @@ const form102Schema = new mongoose.Schema(
     witnessName: String,
     witnessAge: Number,
     witnessAddress: String,
-    dateOfDeath: String,
+    dateOfDeath: Date,
     swearingLocation: String,
     swornDay: Number,
     swornMonth: String,
+    swornYear:Number,
     advocateFor: String,
   },
   { timestamps: true }

@@ -105,13 +105,17 @@ data.netAssets = totalAssets - deductedLiabilities;
     .section-title { font-weight: bold; margin-top: 20px; }
     .page-break { page-break-before: always; }
     .yellow {
-         background: yellow;
-        font-size: 14px;
-        margin-left: 5px;
-       font-weight: bold; 
-       margin-top: 20px;
-       display: flex;
+  background: yellow;
+  font-size: 14px;
+  margin-left: 5px;
+  font-weight: bold; 
+  margin-top: 20px;
+  display: inline-block; 
+  padding: 2px 4px;      
+  border-radius: 4px;  
+  margin-bottom: 20px;   
 }
+
 
   </style>
 </head>
