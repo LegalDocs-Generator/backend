@@ -177,11 +177,12 @@ const updateUserProfile = async (req, res) => {
     const { fullName, phone } = req.body;
     const profilePhoto = req.file ? req.file.path : undefined;
 
-    const updateData = {};
-    if (fullName) updateData.fullName = fullName;
-    if (phone) updateData.phone = phone;
-    if (profilePhoto) updateData.profilePhoto = profilePhoto;
-
+    const updateData = {
+      fullName,
+      phone,
+      profilePhoto
+    };
+    
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
       select: "-password",
