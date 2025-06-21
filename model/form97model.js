@@ -14,6 +14,7 @@ const form97Schema = new mongoose.Schema(
     deceasedFullName: String,
     deceasedNationality: String,
     deceasedAddress: String,
+    deceasedReligion: String,
     deceasedsect: String,
     deceasedMaritalStatus: {
       type: String,
@@ -21,13 +22,13 @@ const form97Schema = new mongoose.Schema(
     },
     deceasedstatus: {
       type: String,
-      enum: ["bachelor", "spinster"],
+      enum: ["Bachelor", "Spinster"],
     },
     deceasedOccupation: String,
     deceasedRescidenceAtTimeOfDeath: String,
-    deceasedDeathDate: Number,
+    deceasedDeathDate: String,
     deceasedDeathMonth: String,
-    deceasedDeathYear: Number,
+    deceasedDeathYear: String,
 
     exhibitNumber1: String,
     exhibitNumber2: String,
@@ -53,9 +54,9 @@ const form97Schema = new mongoose.Schema(
     exhibitNumber3: String,
     exhibitNumber4: String,
     placeOfExecutionOfWill: String,
-    ExecutionDate: Number,
+    ExecutionDate: String,
     ExecutionMonth: String,
-    ExecutionYear: Number,
+    ExecutionYear: String,
 
     capacity: {
       type: String,
@@ -77,9 +78,9 @@ const form97Schema = new mongoose.Schema(
     ],
 
     swornPlace: String,
-    swornDate: Number,
+    swornDate: String,
     swornMonth: String,
-    swornYear: Number,
+    swornYear: String,
     statedPara: String,
     remainingPara: String,
   },
