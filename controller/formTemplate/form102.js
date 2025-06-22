@@ -182,8 +182,7 @@ line-height: 1.4;
 
 const browser = await puppeteer.launch({
   headless: "new",
-  executablePath: puppeteer.executablePath(),
-  args: ["--no-sandbox", "--disable-setuid-sandbox"], 
+  args: ["--no-sandbox", "--disable-setuid-sandbox"]
 });
 
   const page = await browser.newPage();
