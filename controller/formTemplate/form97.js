@@ -4,6 +4,9 @@ process.env.PUPPETEER_CACHE_DIR = '/opt/render/.cache/puppeteer';
 
 const puppeteer = require("puppeteer");
 
+
+console.log("Chrome path:", puppeteer.executablePath());
+
 const generateForm97PDF = async (data) => {
  const personsHtml = Array.isArray(data.person)
   ? data.person
