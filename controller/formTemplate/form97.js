@@ -4,7 +4,7 @@
 const puppeteer = require("puppeteer");
 
 
-console.log("Chrome path:", puppeteer.executablePath());
+// console.log("Chrome path:", puppeteer.executablePath());
 
 const generateForm97PDF = async (data) => {
  const personsHtml = Array.isArray(data.person)
@@ -239,8 +239,8 @@ I, <span class="bold">${data.petitionerFullName || "............................
 
   const browser = await puppeteer.launch({
   headless: "new",
-  executablePath: puppeteer.executablePath(),
-  args: ["--no-sandbox", "--disable-setuid-sandbox"], 
+  // executablePath: puppeteer.executablePath(),
+  // args: ["--no-sandbox", "--disable-setuid-sandbox"], 
 });
 
   const page = await browser.newPage();
