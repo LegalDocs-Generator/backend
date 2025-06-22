@@ -18,9 +18,9 @@ const form102Schema = new mongoose.Schema(
     witnessAddress: String,
     dateOfDeath: Date,
     swearingLocation: String,
-    swornDay: Number,
+    swornDay: String,
     swornMonth: String,
-    swornYear:Number,
+    swornYear:String,
     advocateFor: String,
   },
   { timestamps: true }
