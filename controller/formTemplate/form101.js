@@ -1,5 +1,5 @@
 
-process.env.PUPPETEER_CACHE_DIR = '/opt/render/.cache/puppeteer';
+
 
 const puppeteer = require("puppeteer");
 
@@ -95,7 +95,8 @@ const generateForm101PDF = async (data) => {
 
   const browser = await puppeteer.launch({
   headless: "new",
-  executablePath: puppeteer.executablePath()
+  executablePath: puppeteer.executablePath(),
+  args: ["--no-sandbox", "--disable-setuid-sandbox"], 
 });
 
   const page = await browser.newPage();
