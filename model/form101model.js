@@ -19,9 +19,9 @@ const form101Schema = new mongoose.Schema(
     petitionerName: String,
     relationWithDeeceased: String,
     swearingLocation: String,
-    swornDay: Number,
+    swornDay: String,
     swornMonth: String,
-    swornYear: Number,
+    swornYear: String,
     advocateFor: String,
   },
   { timestamps: true }
