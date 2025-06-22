@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-     "postinstall": "npx puppeteer browsers install chrome"
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "keywords": [],
   "author": "",
@@ -26,8 +26,7 @@
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^7.0.3",
-    "puppeteer": "^24.10.0"
-    
+    "puppeteer": "^22.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
