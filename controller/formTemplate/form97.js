@@ -238,9 +238,7 @@ I, <span class="bold">${data.petitionerFullName || "............................
   </html>`;
 
   const browser = await puppeteer.launch({
-  headless: "new",
-  // executablePath: puppeteer.executablePath(),
-  args: ["--no-sandbox", "--disable-setuid-sandbox"], 
+executablePath: '/path/to/Chrome'
 });
 
   const page = await browser.newPage();
