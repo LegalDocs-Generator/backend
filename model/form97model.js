@@ -19,10 +19,13 @@ const form97Schema = new mongoose.Schema(
     deceasedMaritalStatus: {
       type: String,
       enum: ["Married", "Unmarried", "Widowed", "Divorced", "Separated"],
+      default: "Married",
     },
     deceasedstatus: {
       type: String,
       enum: ["Bachelor", "Spinster"],
+      default: "Bachelor",
+      
     },
     deceasedOccupation: String,
     deceasedRescidenceAtTimeOfDeath: String,
@@ -49,6 +52,7 @@ const form97Schema = new mongoose.Schema(
         "soleSurvivingExecutors",
         "allExecutor",
       ],
+      default: "soleExecutor",
     },
 
     exhibitNumber3: String,
@@ -61,6 +65,7 @@ const form97Schema = new mongoose.Schema(
     capacity: {
       type: String,
       enum: ["soleExecutor", "oneOfExecutor"],
+      default: "soleExecutor",
     },
     exhibitNumber5: String,
     exhibitNumber6: String,
