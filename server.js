@@ -49,6 +49,30 @@ app.use(
   generateFormRoute
 );
 
+app.get("/test-puppeteer", async (req, res) => {
+  try {
+    const puppeteer = require("puppeteer");
+
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
+
+    const page = await browser.newPage();
+    await page.goto("https://example.com");
+    await browser.close();
+
+    res.send("✅ Puppeteer is working!");
+  } catch (err) {
+    res.status(500).json({
+      message: "❌ Puppeteer failed",
+      error: err.message,
+      stack: err.stack,
+    });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
