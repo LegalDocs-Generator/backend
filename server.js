@@ -72,6 +72,15 @@ app.get("/test-puppeteer", async (req, res) => {
   }
 });
 
+app.get("/debug-chrome", async (req, res) => {
+  const puppeteer = require("puppeteer");
+  res.send({
+    executablePath: puppeteer.executablePath?.(),
+    browserVersion: puppeteer.browserRevision,
+  });
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

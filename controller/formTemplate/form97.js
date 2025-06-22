@@ -239,6 +239,7 @@ I, <span class="bold">${data.petitionerFullName || "............................
 
 const browser = await puppeteer.launch({
   headless: "new",
+  product: "chrome",
   args: ["--no-sandbox", "--disable-setuid-sandbox"]
 });
 
