@@ -352,7 +352,11 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
 </body>
 </html>`;
 
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+  headless: "new",
+  executablePath: puppeteer.executablePath()
+});
+
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 

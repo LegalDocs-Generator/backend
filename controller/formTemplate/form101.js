@@ -93,7 +93,11 @@ const generateForm101PDF = async (data) => {
 </body>
 </html>`;
 
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+  headless: "new",
+  executablePath: puppeteer.executablePath()
+});
+
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 

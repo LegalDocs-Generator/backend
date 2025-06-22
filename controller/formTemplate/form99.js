@@ -1,5 +1,4 @@
-
-process.env.PUPPETEER_CACHE_DIR = '/opt/render/.cache/puppeteer';
+process.env.PUPPETEER_CACHE_DIR = "/opt/render/.cache/puppeteer";
 
 const puppeteer = require("puppeteer");
 
@@ -72,21 +71,31 @@ const generateForm99PDF = async (data) => {
     <br>
     <div >IN THE HIGH COURT OF JUDICATURE AT BOMBAY</div>
     <br>
-    <div>TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. <span class="bold">${petitionNumber || ".................................."}</span> of 2020</div>
+    <div>TESTAMENTARY AND INTESTATE JURISDICTION PETITION No. <span class="bold">${
+      petitionNumber || ".................................."
+    }</span> of 2020</div>
   <br>
   </div>
 
   
    <div style="margin-left: 150px; ">
-        Petition for probate of a will of <span class="bold">${deceasedName || ".................................."}</span>
+        Petition for probate of a will of <span class="bold">${
+          deceasedName || ".................................."
+        }</span>
         </div>
         <div style="margin-left: 120px; ">
-      resident <span class="bold">${deceasedAddress ||".................................."}</span> having occupation of
-  <span class="bold">${deceasedOccupation || ".................................."}</span> Deceased
+      resident <span class="bold">${
+        deceasedAddress || ".................................."
+      }</span> having occupation of
+  <span class="bold">${
+    deceasedOccupation || ".................................."
+  }</span> Deceased
 </div>
 
   <div class="right">
-    <span class="bold">${petitionerName || ".................................."}</span> Petitioner
+    <span class="bold">${
+      petitionerName || ".................................."
+    }</span> Petitioner
   </div>
 
   <br>
@@ -104,30 +113,48 @@ const generateForm99PDF = async (data) => {
   <table style="margin-left:30px;">
     <tr>
       <td >Amount of Funeral expenses</td>
-      <td class="amount-cell">Rs. ${!isNaN(parseFloat(funeralExpenses)) ? parseFloat(funeralExpenses).toFixed(2) : "0"}</td>
+      <td class="amount-cell">Rs. ${
+        !isNaN(parseFloat(funeralExpenses))
+          ? parseFloat(funeralExpenses).toFixed(2)
+          : "0"
+      }</td>
     </tr>
      <tr>
       <td>Amount of mortgage encumbrances</td>
-      <td class="amount-cell">Rs. ${!isNaN(parseFloat(mortgageEncumbrances)) ? parseFloat(mortgageEncumbrances).toFixed(2) : "0"}</td>
+      <td class="amount-cell">Rs. ${
+        !isNaN(parseFloat(mortgageEncumbrances))
+          ? parseFloat(mortgageEncumbrances).toFixed(2)
+          : "0"
+      }</td>
     </tr>
     <tr>
       <td class="total">Total</td>
-      <td class="amount-cell">Rs. ${!isNaN(parseFloat(totalAmount)) ? parseFloat(totalAmount).toFixed(2) : "0"}
+      <td class="amount-cell">Rs. ${
+        !isNaN(parseFloat(totalAmount))
+          ? parseFloat(totalAmount).toFixed(2)
+          : "0"
+      }
 </td>
     </tr>
   </table>
   <hr>
 
   <br>
-  <div>Petitioner: <span class="bold">${petitionerName || ".................................."}</span></div>
+  <div>Petitioner: <span class="bold">${
+    petitionerName || ".................................."
+  }</span></div>
 </body>
 </html>`;
 
-  const browser = await puppeteer.launch({ headless: "new" });
+const browser = await puppeteer.launch({
+  headless: "new",
+  executablePath: puppeteer.executablePath()
+});
+
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-    const pdfBuffer = await page.pdf({
+  const pdfBuffer = await page.pdf({
     format: "A4",
     printBackground: true,
     margin: {
@@ -141,6 +168,5 @@ const generateForm99PDF = async (data) => {
   await browser.close();
   return pdfBuffer;
 };
-
 
 module.exports = { generateForm99PDF };
