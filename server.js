@@ -53,7 +53,8 @@ app.get("/test-puppeteer", async (req, res) => {
   try {
     const puppeteer = require("puppeteer");
 
- 
+ console.log("Using Chromium path:", puppeteer.executablePath());
+
   const browser = await puppeteer.launch({
     headless:"new",
      args: [
