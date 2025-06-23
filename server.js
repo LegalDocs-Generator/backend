@@ -55,6 +55,7 @@ app.get("/test-puppeteer", async (req, res) => {
 
  
   const browser = await puppeteer.launch({
+    headless:"new",
      args: [
        "--disable-setuid-sandbox",
        "--no-sandbox",
@@ -77,13 +78,6 @@ app.get("/test-puppeteer", async (req, res) => {
   }
 });
 
-app.get("/debug-chrome", async (req, res) => {
-  const puppeteer = require("puppeteer");
-  res.send({
-    executablePath: puppeteer.executablePath?.(),
-    browserVersion: puppeteer.browserRevision,
-  });
-});
 
 
 
