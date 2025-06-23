@@ -4,7 +4,7 @@
 const puppeteer = require("puppeteer");
 
 
-// console.log("Chrome path:", puppeteer.executablePath());
+console.log("Chrome path:", puppeteer.executablePath());
 
 const generateForm97PDF = async (data) => {
  const personsHtml = Array.isArray(data.person)
@@ -237,13 +237,22 @@ I, <span class="bold">${data.petitionerFullName || "............................
   </body>
   </html>`;
 
-const browser = await puppeteer.launch({
-  headless: "new",
-  product: "chrome",
-  args: ["--no-sandbox", "--disable-setuid-sandbox"]
-});
-
+ const browser = await puppeteer.launch({
+    args: [
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote",
+    ],
+    executablePath:
+      process.env.NODE_ENV === "production"
+        ? process.env.PUPPETEER_EXECUTABLE_PATH
+        : puppeteer.executablePath(),
+  });
   const page = await browser.newPage();
+  
+ await page.goto("https://developer.chrome.com/");
+
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
   const pdfBuffer = await page.pdf({

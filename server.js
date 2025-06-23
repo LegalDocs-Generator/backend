@@ -53,13 +53,22 @@ app.get("/test-puppeteer", async (req, res) => {
   try {
     const puppeteer = require("puppeteer");
 
-    const browser = await puppeteer.launch({
-      headless: "new",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"]
-    });
+ 
+  const browser = await puppeteer.launch({
+     args: [
+       "--disable-setuid-sandbox",
+       "--no-sandbox",
+       "--single-process",
+       "--no-zygote",
+     ],
+     executablePath:
+       process.env.NODE_ENV === "production"
+         ? process.env.PUPPETEER_EXECUTABLE_PATH
+         : puppeteer.executablePath(),
+   });
 
     const page = await browser.newPage();
-    await page.goto("https://example.com");
+  await page.goto("https://developer.chrome.com/");
     await browser.close();
 
     res.send("✅ Puppeteer is working!");
