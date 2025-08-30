@@ -3,12 +3,14 @@ const mongoose = require("mongoose");
 const form102Schema = new mongoose.Schema(
   {
     userId: {
-  type: mongoose.Schema.Types.ObjectId, 
-  required: true,
-  unique: true
-},
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
 
-    petitionNumber: String,
+    petitionNumber: {
+      type: String,
+      unique: true
+    },
     deceasedName: String,
     deceasedAddress: String,
     deceasedOccupation: String,
@@ -20,12 +22,12 @@ const form102Schema = new mongoose.Schema(
     swearingLocation: String,
     swornDay: String,
     swornMonth: String,
-    swornYear:String,
+    swornYear: String,
     advocateFor: String,
   },
   { timestamps: true }
 );
 
-const Form102 =  mongoose.model("form102", form102Schema);
+const Form102 = mongoose.model("form102", form102Schema);
 
-module.exports =Form102;
+module.exports = Form102;

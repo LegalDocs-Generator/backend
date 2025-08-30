@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer");
+const { generatePDFfromHTML } = require("../../utils/puppeteerService");
 
-const generateForm102PDF = async (data) => {
+const getForm102HTML = async (data) => {
   const {
     petitionNumber = "",
     deceasedName = "",
@@ -23,48 +24,74 @@ const generateForm102PDF = async (data) => {
     year: "numeric",
   });
 
-  const htmlContent = `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
   <style>
-    body {
-     font-family: Arial, sans-serif;
-            margin: 1.5cm;
-            padding: 0;
-            font-size: 13px;  
-    }
-    .center {
-      text-align: center;
-    }
-    .right {
-      text-align: right;
-    }
-    .bold {
-      font-weight: bold;
-    }
-      .left-margin{
-      margin-left:30px;
-      }
-.numbered-line {
- margin-left:30px;
-  display: flex;
-  align-items: flex-start;
-}
+  body {
+    font-family: "Times New Roman";
+    font-size: 12px;
+    padding: 0;
+    margin: 0; /* let @page control margins */
+  }
 
-.number {
-  width: 20px;
-  flex-shrink: 0;
-}
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
 
-.text {
-  flex: 1;
-  text-align: justify;
-}
-div{
-line-height: 1.4;
-}
-  </style>
+  .left-margin {
+    margin-left: 30px;
+  }
+
+  .numbered-line {
+    margin-left: 30px;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .number {
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .text {
+    flex: 1;
+    text-align: justify;
+  }
+
+  div {
+    line-height: 1.6; /* keep consistent with Forms 98–101 */
+  }
+
+  table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse;
+  }
+
+  td {
+    vertical-align: top;
+    padding: 3px;
+  }
+
+  @page {
+    size: A4;
+    margin-top: 2cm;
+    margin-bottom: 2cm;
+  }
+
+  @page :left {
+    margin-left: 3cm;
+    margin-right: 5cm;
+  }
+
+  @page :right {
+    margin-left: 5cm;
+    margin-right: 3cm;
+  }
+</style>
+
 </head>
 <body>
   <div class="center">
@@ -176,24 +203,11 @@ line-height: 1.4;
   }</span></div>
 </body>
 </html>`;
-
-  const browser = await puppeteer.launch({ headless: "new" });
-  const page = await browser.newPage();
-  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-
-  const pdfBuffer = await page.pdf({
-    format: "A4",
-    printBackground: true,
-    margin: {
-      top: "40px",
-      bottom: "40px",
-      left: "50px",
-      right: "50px",
-    },
-  });
-
-  await browser.close();
-  return pdfBuffer;
 };
 
-module.exports = { generateForm102PDF };
+async function generateForm102PDF(data) {
+  const html = await getForm102HTML(data);
+  return await generatePDFfromHTML(html);
+}
+
+module.exports = { generateForm102PDF, getForm102HTML };

@@ -3,12 +3,14 @@ const mongoose = require("mongoose");
 const form98Schema = new mongoose.Schema(
   {
     userId: {
-  type: mongoose.Schema.Types.ObjectId, 
-  required: true,
-  unique: true
-},
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
 
-    petitionNumber: Number,
+    petitionNumber: {
+      type: String,
+      unique: true
+    },
     deceasedName: String,
     deceasedAddress: String,
     deceasedOccupation: String,

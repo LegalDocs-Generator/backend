@@ -1,7 +1,7 @@
-const puppeteer = require("puppeteer");
+const { generatePDFfromHTML } = require("../../utils/puppeteerService");
 
 
-const generateForm100PDF = async (data) => {
+const getForm100HTML = async (data) => {
   const {
     petitionNumber = "",
     deceasedName = "",
@@ -11,44 +11,61 @@ const generateForm100PDF = async (data) => {
     property = 0,
   } = data;
 
-  const htmlContent = `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
   <style>
-    body {
-    font-family: Arial, sans-serif;
-            margin: 1.5cm;
-            padding: 0;
-            font-size: 13px;  
-    }
-    .center {
-      text-align: center;
-    }
-    .right {
-      text-align: right;
-    }
-    .bold {
-      font-weight: bold;
-    }
-    hr {
-      border: none;
-      border-top: 1px solid black;
-      margin: 8px 0;
-    }
-    table {
-      width: 100%;
-      margin-top: 15px;
-    }
-    td {
-      vertical-align: top;
-    }
-      div{
-line-height: 1.4;
-}
-     
-     
-  </style>
+  body {
+    font-family: "Times New Roman";
+    font-size: 12px;
+    padding: 0;
+    margin: 0; /* avoid conflict, let @page define margins */
+  }
+
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
+
+  hr {
+    border: none;
+    border-top: 1px solid black;
+    margin: 8px 0;
+  }
+
+  table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse; /* consistency across forms */
+  }
+
+  td {
+    vertical-align: top;
+    padding: 3px;
+  }
+
+  div {
+    line-height: 1.6; /* balanced between Form97 (2) and Form99 (1.4) */
+  }
+
+  /* Standardized margins for all forms */
+  @page {
+    size: A4;
+    margin-top: 2cm;
+    margin-bottom: 2cm;
+  }
+
+  @page :left {
+    margin-left: 3cm;   /* inner */
+    margin-right: 5cm;  /* outer */
+  }
+
+  @page :right {
+    margin-left: 5cm;   /* inner */
+    margin-right: 3cm;  /* outer */
+  }
+</style>
+
 </head>
 <body>
   <div class="center">
@@ -105,27 +122,11 @@ line-height: 1.4;
   <div>Petitioner: <span class="bold">${petitionerName || ".................................."}</span></div>
 </body>
 </html>`;
-
-  const browser = await puppeteer.launch({ headless: "new" });
-  const page = await browser.newPage();
-  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-
-   const pdfBuffer = await page.pdf({
-    format: "A4",
-    printBackground: true,
-    margin: {
-      top: "40px",
-      bottom: "40px",
-      left: "50px",
-      right: "50px",
-    },
-  });
-
-
-  await browser.close();
-  return pdfBuffer;
 };
 
+async function generateForm100PDF(data) {
+  const html = await getForm100HTML(data);
+  return await generatePDFfromHTML(html);
+}
 
-
-module.exports = { generateForm100PDF };
+module.exports = { generateForm100PDF, getForm100HTML };

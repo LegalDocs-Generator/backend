@@ -5,74 +5,85 @@ const form97Schema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      unique: true,
     },
-
-    petitionNumber: String,
+    petitionNumber: {
+      type: String,
+      unique: true,
+      required: true,
+    },
     petitionYear: Number,
-
     deceasedFullName: String,
     deceasedNationality: String,
     deceasedAddress: String,
-    deceasedReligion: String,
-    deceasedsect: String,
+    deceasedReligion: {
+      type: String,
+      enum: ["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain"],
+    },
+    deceasedSect: String,
     deceasedMaritalStatus: {
       type: String,
-      enum: ["Married", "Unmarried", "Widowed", "Divorced", "Separated"],
+      enum: ["Married", "Widowed", "Divorced", "Separated", "Bachelor", "Spinster", "Widower"],
       default: "Married",
     },
-    deceasedstatus: {
-      type: String,
-      enum: ["Bachelor", "Spinster"],
-      default: "Bachelor",
-      
-    },
     deceasedOccupation: String,
-    deceasedRescidenceAtTimeOfDeath: String,
+    deceasedResidenceAtTimeOfDeath: String,
     deceasedDeathDate: String,
     deceasedDeathMonth: String,
     deceasedDeathYear: String,
-
+    religionAtBirth: String,
+    religionAtWill: String,
+    religionAtDeath: String,
     exhibitNumber1: String,
     exhibitNumber2: String,
     placeOfAbode: String,
-
-    //Petitoner details
     petitionerFullName: String,
-    petitionerage: Number,
+    petitionerAge: Number,
     petitionerNationality: String,
     petitionerDomicile: String,
     petitionerFullAddress: String,
     petitionerOccupation: String,
-    executor: {
+    executorRole: {
       type: String,
-      enum: [
-        "soleExecutor",
-        "oneOfTheExecutor",
-        "soleSurvivingExecutors",
-        "allExecutor",
-      ],
+      enum: ["soleExecutor", "oneOfTheExecutor", "soleSurvivingExecutors", "allExecutor"],
       default: "soleExecutor",
     },
-
+    executors: [
+      {
+        fullName: String,
+        age: Number,
+        address: String,
+        occupation: String,
+        isPetitioner: { type: Boolean, default: false },
+      },
+    ],
+    executorExplanation: String,
+    executorAnnexure: String,
+    deathCertificateAnnexure: String,
     exhibitNumber3: String,
     exhibitNumber4: String,
     placeOfExecutionOfWill: String,
-    ExecutionDate: String,
-    ExecutionMonth: String,
-    ExecutionYear: String,
-
-    capacity: {
+    executionDate: String,
+    executionMonth: String,
+    executionYear: String,
+    willCopyType: {
       type: String,
-      enum: ["soleExecutor", "oneOfExecutor"],
-      default: "soleExecutor",
+      enum: ["Original", "Photocopy", "Certified Copy"],
+      default: "Original",
     },
+    willUnavailabilityReason: String,
     exhibitNumber5: String,
     exhibitNumber6: String,
     exhibitNumber7: String,
-    schduleAmount: Number,
-    lawApplicableToTheDeceased: String,
-
+    annexures: [String],
+    scheduleAmount: Number,
+    lawApplicableToTheDeceased: {
+      type: String,
+      enum: [
+        "Indian Succession Act, 1925",
+        "Hindu Succession Act, 1956",
+        "Muslim Personal Law (Shariat) Application Act, 1937",
+      ],
+    },
     person: [
       {
         fullName: String,
@@ -81,7 +92,9 @@ const form97Schema = new mongoose.Schema(
         relationshipWithDeceased: String,
       },
     ],
-
+    identityProof: String,
+    identityProofUnavailableReason: String,
+    annexureForIdentityProof: String,
     swornPlace: String,
     swornDate: String,
     swornMonth: String,

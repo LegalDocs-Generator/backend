@@ -2,9 +2,9 @@ const { serialize } = require("cookie");
 const clearTokenCookie = (res) => {
   res.setHeader("Set-Cookie", serialize("token", "", {
     httpOnly: true,
-    secure: true,       
-    sameSite: "none",      
-    path: "/",            
+    secure: false,       
+    sameSite: "lax",      
+    path: "/",
     expires: new Date(0), 
   }));
 };
