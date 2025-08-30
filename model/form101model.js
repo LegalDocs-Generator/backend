@@ -5,10 +5,12 @@ const form101Schema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      unique: true,
     },
 
-    petitionNumber: String,
+    petitionNumber: {
+      type: String,
+      unique: true
+    },
     deceasedName: String,
     deceasedName1: String,
     deceasedName2: String,

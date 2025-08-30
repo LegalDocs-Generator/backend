@@ -4,33 +4,37 @@ const submitForm98 = async (req, res) => {
   try {
     const userId = req.user.id;
     const formData = req.body;
+    const { petitionNumber } = formData;
 
-    if (!userId) {
-      return res.status(401).json({
+    if (!petitionNumber) {
+      return res.status(400).json({
         success: false,
-        message: "Unauthorized: User ID missing.",
+        message: "Petition number is required.",
       });
     }
 
-    const existingForm = await Form98.findOne({ userId });
+    const existingForm = await Form98.findOne({ userId, petitionNumber });
 
     if (existingForm) {
-      await Form98.updateOne({ userId }, { $set: formData });
+      await Form98.updateOne(
+        { userId, petitionNumber },
+        { $set: formData }
+      );
 
       return res.status(200).json({
         success: true,
-        message: "Form updated successfully.",
+        message: "Form 98 updated successfully.",
       });
     } else {
       await Form98.create({ userId, ...formData });
 
-      return res.status(200).json({
+      return res.status(201).json({
         success: true,
-        message: "Form saved successfully.",
+        message: "Form 98 created successfully.",
       });
     }
   } catch (error) {
-    console.error("Error in submitForm:", error.message);
+    console.error("Error in submitForm98:", error.message);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -39,23 +43,36 @@ const submitForm98 = async (req, res) => {
   }
 };
 
-
 const getForm98 = async (req, res) => {
   try {
     const userId = req.user.id;
-    const form = await Form98.findOne({ userId });
+    const { petitionNumber } = req.params;
+
+    if (!petitionNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Petition number is required.",
+      });
+    }
+
+    const form = await Form98.findOne({ userId, petitionNumber });
 
     if (!form) {
-      return res.status(404).json({ success: false, message: "Form 98 not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Form 98 not found for this petition number",
+      });
     }
 
     res.status(200).json({ success: true, data: form });
   } catch (error) {
     console.error("Error in getForm98:", error.message);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };
 
-
-
-module.exports = { submitForm98,getForm98 };
+module.exports = { submitForm98, getForm98 };

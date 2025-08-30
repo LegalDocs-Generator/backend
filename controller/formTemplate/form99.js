@@ -1,6 +1,6 @@
-const puppeteer = require("puppeteer");
+const { generatePDFfromHTML } = require("../../utils/puppeteerService");
 
-const generateForm99PDF = async (data) => {
+const getForm99HTML = async (data) => {
   const {
     petitionNumber = "",
     deceasedName = "",
@@ -13,52 +13,68 @@ const generateForm99PDF = async (data) => {
   const totalAmount =
     parseFloat(funeralExpenses) + parseFloat(mortgageEncumbrances);
 
-  const htmlContent = `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
   <style>
-    body {
-    font-family: Arial, sans-serif;
-            margin: 1.5cm;
-            padding: 0;
-            font-size: 13px;  
-    }
-    .center {
-      text-align: center;
-    }
-    .right {
-      text-align: right;
-    }
-    .bold {
-      font-weight: bold;
-    }
-    hr {
-      border: none;
-      border-top: 1px solid black;
-      margin: 8px 0;
-    }
-    table {
-      width: 100%;
-      margin-top: 15px;
-    }
-    td {
-      vertical-align: top;
-    }
-      div{
-       line-height: 1.4;
-      }
-      .total{
-      margin-left:400px;
-      }
-      .amount-cell {
-      text-align: right;
-      font-weight: bold;
-      margin-right:100px;
-    }
-     
-     
-  </style>
+  body {
+    font-family: "Times New Roman";
+    font-size: 12px;
+    padding: 0;
+    margin: 0;  /* let @page handle margins */
+  }
+
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
+
+  hr {
+    border: none;
+    border-top: 1px solid black;
+    margin: 8px 0;
+  }
+
+  table {
+  width: calc(100% - 60px);  /* leave breathing space on both sides */
+  margin-left: 30px;
+  margin-right: 30px;
+  border-collapse: collapse;
+  table-layout: fixed;       /* prevent overflow */
+}
+
+td {
+  vertical-align: top;
+  padding: 3px;
+  word-wrap: break-word;     /* wrap long text */
+  overflow-wrap: break-word;
+}
+
+.amount-cell {
+  text-align: right;
+  font-weight: bold;
+  padding-right: 10px;       /* instead of large padding that may push out */
+}
+
+
+  /* Page setup - consistent across all forms */
+  @page {
+    size: A4;
+    margin-top: 2cm;
+    margin-bottom: 2cm;
+  }
+
+  @page :left {
+    margin-left: 3cm;   /* inner */
+    margin-right: 5cm;  /* outer */
+  }
+
+  @page :right {
+    margin-left: 5cm;   /* inner */
+    margin-right: 3cm;  /* outer */
+  }
+</style>
+
 </head>
 <body>  
   <div class="center">
@@ -119,25 +135,11 @@ const generateForm99PDF = async (data) => {
   <div>Petitioner: <span class="bold">${petitionerName || ".................................."}</span></div>
 </body>
 </html>`;
-
-  const browser = await puppeteer.launch({ headless: "new" });
-  const page = await browser.newPage();
-  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-
-    const pdfBuffer = await page.pdf({
-    format: "A4",
-    printBackground: true,
-    margin: {
-      top: "40px",
-      bottom: "40px",
-      left: "50px",
-      right: "50px",
-    },
-  });
-
-  await browser.close();
-  return pdfBuffer;
 };
 
+async function generateForm99PDF(data) {
+  const html = await getForm99HTML(data);
+  return await generatePDFfromHTML(html);
+}
 
-module.exports = { generateForm99PDF };
+module.exports = { generateForm99PDF, getForm99HTML };

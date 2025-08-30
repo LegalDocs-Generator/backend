@@ -1,7 +1,7 @@
-const puppeteer = require("puppeteer");
+const { generatePDFfromHTML } = require("../../utils/puppeteerService");
 
 
-const generateForm98PDF = async (data) => {
+const getForm98HTML = async (data) => {
   function sumArray(arr, key) {
     if (!Array.isArray(arr)) return 0;
     return arr.reduce((sum, item) => {
@@ -82,42 +82,80 @@ const generateForm98PDF = async (data) => {
   // const mortgage = parseFloat(data.mortgageEncumbrances || 0);
   // data.deductedLiabilities = funeral + mortgage;
   const totalAssets = parseFloat(data.totalAssets) || 0;
-const deductedLiabilities = parseFloat(data.deductedLiabilities) || 0;
+  const deductedLiabilities = parseFloat(data.deductedLiabilities) || 0;
 
-data.netAssets = totalAssets - deductedLiabilities;
+  data.netAssets = totalAssets - deductedLiabilities;
 
 
-  const htmlContent = `<!DOCTYPE html>
+  return `
+  <!DOCTYPE html>
 <html>
 <head>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 1.5cm;
-      font-size: 13px;
-      position: relative;
-    }
-    .center { text-align: center; }
-    .right { text-align: right; }
-    .bold { font-weight: bold; }
-    table { width: 100%; border-collapse: collapse; margin-top: 5px; border: 1px dotted black; }
-    td, th { padding: 3px; border: 1px dotted black; vertical-align: top; }
-    .section-title { font-weight: bold; margin-top: 20px; }
-    .page-break { page-break-before: always; }
-    .yellow {
-  background: yellow;
-  font-size: 14px;
-  margin-left: 5px;
-  font-weight: bold; 
-  margin-top: 20px;
-  display: inline-block; 
-  padding: 2px 4px;      
-  border-radius: 4px;  
-  margin-bottom: 20px;   
-}
+  body {
+    font-family: "Times New Roman";
+    font-size: 12px;
+    line-height: 2;
+    margin: 1.5cm;
+    position: relative;
+  }
 
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
 
-  </style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+    border: 1px dotted black;
+  }
+
+  td, th {
+    padding: 3px;
+    border: 1px dotted black;
+    vertical-align: top;
+  }
+
+  .section-title {
+    font-weight: bold;
+    margin-top: 20px;
+  }
+
+  .page-break { 
+    page-break-before: always; 
+  }
+
+  .yellow {
+    background: yellow;
+    font-size: 12px;
+    margin-left: 5px;
+    font-weight: bold; 
+    margin-top: 20px;
+    display: inline-block; 
+    padding: 2px 4px;      
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  /* Page setup like Form97 */
+  @page {
+    size: A4;
+    margin-top: 2cm;
+    margin-bottom: 2cm;
+  }
+
+  @page :left {
+    margin-left: 3cm;   /* inner */
+    margin-right: 5cm;  /* outer */
+  }
+
+  @page :right {
+    margin-left: 5cm;   /* inner */
+    margin-right: 3cm;  /* outer */
+  }
+</style>
+
 </head>
 <body>
 
@@ -153,71 +191,61 @@ data.netAssets = totalAssets - deductedLiabilities;
 <!-- All tables and values stay on Page 1 -->
 <div class="section-title">Cash in house, household goods, wearing apparel, books, plate, jewels</div>
 <table>
-  <tr><td>Cash in house</td><td>Rs. ${
-    !isNaN(parseFloat(cashInHouse)) ? parseFloat(cashInHouse).toFixed(2) : "0"
-  }</td></tr>
+  <tr><td>Cash in house</td><td>Rs. ${!isNaN(parseFloat(cashInHouse)) ? parseFloat(cashInHouse).toFixed(2) : "0"
+    }</td></tr>
 
-  <tr><td>Household Goods</td><td>Rs. ${
-    !isNaN(parseFloat(householdGoods))
+  <tr><td>Household Goods</td><td>Rs. ${!isNaN(parseFloat(householdGoods))
       ? parseFloat(householdGoods).toFixed(2)
       : "0"
-  }</td></tr>
+    }</td></tr>
 
-  <tr><td>Wearing apparel</td><td>Rs. ${
-    !isNaN(parseFloat(wearingApparel))
+  <tr><td>Wearing apparel</td><td>Rs. ${!isNaN(parseFloat(wearingApparel))
       ? parseFloat(wearingApparel).toFixed(2)
       : "0"
-  }</td></tr>
+    }</td></tr>
 
-  <tr><td>Books</td><td>Rs. ${
-    !isNaN(parseFloat(books)) ? parseFloat(books).toFixed(2) : "0"
-  }</td></tr>
-  <tr><td>Plates</td><td>Rs. ${
-    !isNaN(parseFloat(plates)) ? parseFloat(plates).toFixed(2) : "0"
-  }</td></tr>
-  <tr><td>Jewel</td><td>Rs. ${
-    !isNaN(parseFloat(jewels)) ? parseFloat(jewels).toFixed(2) : "0"
-  }</td></tr>
-  <tr><td>Furniture</td><td>Rs. ${
-    !isNaN(parseFloat(furniture)) ? parseFloat(furniture).toFixed(2) : "0"
-  }</td></tr>
-  <tr class="bold"><td>Total</td><td>Rs. ${
-    !isNaN(parseFloat(movableTotal)) ? parseFloat(movableTotal).toFixed(2) : "0"
-  }</td></tr>
+  <tr><td>Books</td><td>Rs. ${!isNaN(parseFloat(books)) ? parseFloat(books).toFixed(2) : "0"
+    }</td></tr>
+  <tr><td>Plates</td><td>Rs. ${!isNaN(parseFloat(plates)) ? parseFloat(plates).toFixed(2) : "0"
+    }</td></tr>
+  <tr><td>Jewel</td><td>Rs. ${!isNaN(parseFloat(jewels)) ? parseFloat(jewels).toFixed(2) : "0"
+    }</td></tr>
+  <tr><td>Furniture</td><td>Rs. ${!isNaN(parseFloat(furniture)) ? parseFloat(furniture).toFixed(2) : "0"
+    }</td></tr>
+  <tr class="bold"><td>Total</td><td>Rs. ${!isNaN(parseFloat(movableTotal)) ? parseFloat(movableTotal).toFixed(2) : "0"
+    }</td></tr>
 </table>
 
 <div class="section-title">Bank Accounts</div>
 <table>
   <tr><th>Bank</th><th>Account No</th><th>Current Value</th></tr>
   ${bankAccounts
-    ?.map(
-      (account) => `
-    <tr><td>${account.bankName || " "}</td><td>${
-        account.accountNumber || " "
-      }</td><td>${parseFloat(account.value || 0).toFixed(2)}</td></tr>
+      ?.map(
+        (account) => `
+    <tr><td>${account.bankName || " "}</td><td>${account.accountNumber || " "
+          }</td><td>${parseFloat(account.value || 0).toFixed(2)}</td></tr>
   `
-    )
-    .join("")}
+      )
+      .join("")}
   <tr class="bold"><td colspan="2">Total</td><td>${parseFloat(
-    data.totalBankValue || 0
-  ).toFixed(2)}</td></tr>
+        data.totalBankValue || 0
+      ).toFixed(2)}</td></tr>
 </table>
 
 <div class="section-title">Fixed Deposits</div>
 <table>
   <tr><th>Bank</th><th>Receipt/Certificate Details</th><th>Current Value</th></tr>
   ${fixedDeposits
-    ?.map(
-      (fd) => `
-    <tr><td>${fd.bankName || " "}</td><td>${
-        fd.receiptDetails || " "
-      }</td><td>${parseFloat(fd.value || 0).toFixed(2)}</td></tr>
+      ?.map(
+        (fd) => `
+    <tr><td>${fd.bankName || " "}</td><td>${fd.receiptDetails || " "
+          }</td><td>${parseFloat(fd.value || 0).toFixed(2)}</td></tr>
   `
-    )
-    .join("")}
+      )
+      .join("")}
   <tr class="bold"><td colspan="2">Total</td><td>${parseFloat(
-    data.totalFixedDepositValue || 0
-  ).toFixed(2)}</td></tr>
+        data.totalFixedDepositValue || 0
+      ).toFixed(2)}</td></tr>
 </table>
 
 <div class="section-title">Government Securities—</div>
@@ -227,17 +255,17 @@ data.netAssets = totalAssets - deductedLiabilities;
 <table>
   <tr><th>Description</th><th>Assessed Value</th></tr>
   ${immovableProperty
-    ?.map(
-      (prop) => `
+      ?.map(
+        (prop) => `
     <tr><td>${prop.description || " "}</td><td>${parseFloat(
-        prop.value || 0
-      ).toFixed(2)}</td></tr>
+          prop.value || 0
+        ).toFixed(2)}</td></tr>
   `
-    )
-    .join("")}
+      )
+      .join("")}
   <tr class="bold"><td>Total</td><td>${parseFloat(
-    data.totalImmovableValue || 0
-  ).toFixed(2)}</td></tr>
+        data.totalImmovableValue || 0
+      ).toFixed(2)}</td></tr>
 </table>
 
 <div class="section-title">Leasehold Property—</div>
@@ -255,17 +283,17 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
 <div class="section-title">Debenture/Bond</div>
 <table>
   ${debenture
-    ?.map(
-      (prop) => `
+      ?.map(
+        (prop) => `
     <tr><td>${prop.description || " "}</td><td>${parseFloat(
-        prop.value || 0
-      ).toFixed(2)}</td></tr>
+          prop.value || 0
+        ).toFixed(2)}</td></tr>
   `
-    )
-    .join("")}
+      )
+      .join("")}
   <tr class="bold"><td>Total</td><td>${parseFloat(
-    data.totalDebentureValue || 0
-  ).toFixed(2)}</td></tr>
+        data.totalDebentureValue || 0
+      ).toFixed(2)}</td></tr>
 </table>
 
 
@@ -273,67 +301,59 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
 <table>
   <tr><th>Folio</th><th>Scheme Name</th><th>Current units</th><th>Current NAV (Rs.)</th><th>Current value (Rs.)</th></tr>
   ${mutualFunds
-    ?.map(
-      (mf) => `
-    <tr><td>${mf.folio}</td><td>${mf.schemeName}</td><td>${
-        mf.currentUnits
-      }</td><td> ${parseFloat(mf.currentNav || 0).toFixed(
-        2
-      )}</td><td>${parseFloat(mf.currentValue || 0).toFixed(2)}</td></tr>
+      ?.map(
+        (mf) => `
+    <tr><td>${mf.folio}</td><td>${mf.schemeName}</td><td>${mf.currentUnits
+          }</td><td> ${parseFloat(mf.currentNav || 0).toFixed(
+            2
+          )}</td><td>${parseFloat(mf.currentValue || 0).toFixed(2)}</td></tr>
   `
-    )
-    .join("")}
+      )
+      .join("")}
 </table>
 
 <div  class="yellow">Mutual Fund Missed Dividends</div>
 <table>
   <tr><th>Folio</th><th>Unclaimed Scheme</th><th>Unclaimed Amount (Rs.)</th></tr>
   ${mutualFundsMissedDividends
-    ?.map(
-      (div) => `
-    <tr><td>${div.folio}</td><td>${
-        div.UnclaimedSchemeName
-      }</td><td>${parseFloat(div.UnclaimedAmount || 0).toFixed(2)}</td></tr>
+      ?.map(
+        (div) => `
+    <tr><td>${div.folio}</td><td>${div.UnclaimedSchemeName
+          }</td><td>${parseFloat(div.UnclaimedAmount || 0).toFixed(2)}</td></tr>
   `
-    )
-    .join("")}
+      )
+      .join("")}
 </table>
 
 <div class="section-title">Royalties / Fees from Sale of Books</div>
 <table>
   <tr><th>Sr No</th><th>Book Name</th><th>Earned Income</th></tr>
   ${royalties
-    ?.map(
-      (royalty, index) => `
+      ?.map(
+        (royalty, index) => `
     <tr><td>${index + 1}</td><td>${royalty.bookName}</td><td>${parseFloat(
-        royalty.earnedIncome || 0
-      ).toFixed(2)}</td></tr>
+          royalty.earnedIncome || 0
+        ).toFixed(2)}</td></tr>
   `
-    )
-    .join("")}
+      )
+      .join("")}
   <tr class="bold"><td colspan="2">Total</td><td>${parseFloat(
-    data.totalRoyaltiesIncome || 0
-  ).toFixed(2)}</td></tr>
+        data.totalRoyaltiesIncome || 0
+      ).toFixed(2)}</td></tr>
 </table>
 
 <div class="section-title">Other Assets:</div>
 <ol>
-  <li>Adani Electricity Account Number: ${
-    adaniAccountNumber || "............."
-  }</li>
-  <li>Security Deposit of ${
-    adaniSecurityDeposit || "............."
-  } or Adani Electricity Account Number  ${
-    adaniAccountNumber || "............."
-  }</li>
-  <li>Mahanagar Gas connection bearing BP No. : ${
-    mahanagarGPBearingBPNo || "............."
-  } / CA No.: ${mahanagarBearingCANo || "............."}</li>
-  <li>Security Deposit of Rs ${
-    mahanagarSecurityDeposit || "............."
-  }for Mahanagar Gas connection BP No. : ${
-    mahanagarGPBPNo || "............."
-  } / CA No. :  ${mahanagarCANo || "............."} </li>
+  <li>Adani Electricity Account Number: ${adaniAccountNumber || "............."
+    }</li>
+  <li>Security Deposit of ${adaniSecurityDeposit || "............."
+    } or Adani Electricity Account Number  ${adaniAccountNumber || "............."
+    }</li>
+  <li>Mahanagar Gas connection bearing BP No. : ${mahanagarGPBearingBPNo || "............."
+    } / CA No.: ${mahanagarBearingCANo || "............."}</li>
+  <li>Security Deposit of Rs ${mahanagarSecurityDeposit || "............."
+    }for Mahanagar Gas connection BP No. : ${mahanagarGPBPNo || "............."
+    } / CA No. :  ${mahanagarCANo || "............."} </li>
   <li>SIM Card Number: ${simCardNumber || "............."}</li>
 </ol>
 
@@ -348,26 +368,12 @@ upon life, money out on mortgage and other securi­ties, such as bonds, mortgage
 
 </body>
 </html>`;
-
-  const browser = await puppeteer.launch({ headless: "new" });
-  const page = await browser.newPage();
-  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-
-  const pdfBuffer = await page.pdf({
-    format: "A4",
-    printBackground: true,
-    margin: {
-      top: "40px",
-      bottom: "40px",
-      left: "50px",
-      right: "50px",
-    },
-  });
-
-  await browser.close();
-  return pdfBuffer;
 };
 
+async function generateForm98PDF(data) {
+  const html = await getForm98HTML(data);
+  return await generatePDFfromHTML(html);
+}
 
 
-module.exports = { generateForm98PDF };
+module.exports = { generateForm98PDF, getForm98HTML };
