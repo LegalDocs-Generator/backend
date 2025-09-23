@@ -27,6 +27,7 @@ npm install
 ### 3. Create `.env` File
 ```env
 PORT=8000
+appName=
 MONGO_URL=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 ADMIN_EMAIL=your_admin_email
