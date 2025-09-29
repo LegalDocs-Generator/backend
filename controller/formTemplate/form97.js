@@ -88,7 +88,7 @@ const getForm97HTML = async (data) => {
     </div>
 
     <div>
-    being the <span class="bold">${data.executor || ".................................."}</span> named in the Will of the abovenamed Deceased.<span class="right"> </span>
+    being the <span class="bold">${data.executors[0].fullName || ".................................."}</span> named in the Will of the abovenamed Deceased.<span class="right"> </span>
     </div>
   </div>
 
@@ -105,7 +105,7 @@ const getForm97HTML = async (data) => {
   <div class="underline bold">SHEWETH:</div>
   <br>
   <div style="word-spacing: 10px;"><span style="margin-right:15px;">(1)</span>
-  That  the  abovenamed <span class="bold">${data.deceasedFullName || ".................................."}</span> died at <span class="bold">${data.deceasedRescidenceAtTimeOfDeath || ".................................."}</span> on or about the <span class="bold">${data.deceasedDeathDate || "........"}</span> day of 
+  That  the  abovenamed <span class="bold">${data.deceasedFullName || ".................................."}</span> died at <span class="bold">${data.deceasedResidenceAtTimeOfDeath || ".................................."}</span> on or about the <span class="bold">${data.deceasedDeathDate || "........"}</span> day of 
   <span class="bold">${data.deceasedDeathMonth || "........"}</span>, 
   <span class="bold">${data.deceasedDeathYear || "........"}</span>.
   A true copy of Death Certificate of the Deceased is annexed hereto and marked as Exhibit "<span class="bold">${data.exhibitNumber1 || ".................................."}</span>" and a true copy of identity proof of the Deceased is annexed hereto and marked as Exhibit “<span class="bold">${data.exhibitNumber2 || ".................................."}</span>”. 
@@ -131,9 +131,9 @@ const getForm97HTML = async (data) => {
   <div style="word-spacing: 10px;">
   <span style="margin-right:15px;">(4)</span>
   That the said Will was executed at <span class="bold">${data.placeOfExecutionOfWill || ".................................."}</span>  
-  on the <span class="bold">${data.ExecutionDate || "........"}</span> day of 
-  <span class="bold">${data.ExecutionMonth || "........"}</span>, 
-  <span class="bold">${data.ExecutionYear || "........"}</span>.
+  on the <span class="bold">${data.executionDate || "........"}</span> day of 
+  <span class="bold">${data.executionMonth || "........"}</span>, 
+  <span class="bold">${data.executionYear || "........"}</span>.
   </div>
   <br>
   <div style="word-spacing: 10px;"><span style="margin-right:15px;">(5)</span>

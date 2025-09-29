@@ -8,7 +8,7 @@ const form97Schema = new mongoose.Schema(
     },
     petitionNumber: {
       type: String,
-      unique: true,
+      // unique: true,
       required: true,
     },
     petitionYear: Number,
@@ -37,7 +37,7 @@ const form97Schema = new mongoose.Schema(
     exhibitNumber2: String,
     placeOfAbode: String,
     petitionerFullName: String,
-    petitionerAge: Number,
+    petitionerage: Number,
     petitionerNationality: String,
     petitionerDomicile: String,
     petitionerFullAddress: String,
@@ -104,6 +104,6 @@ const form97Schema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+form97Schema.index({ userId: 1, petitionNumber: 1 }, { unique: true });
 const Form97 = mongoose.model("form97", form97Schema);
 module.exports = Form97;

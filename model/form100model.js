@@ -8,7 +8,8 @@ const form100Schema = new mongoose.Schema({
 
   petitionNumber: {
     type: String,
-    unique: true
+    // unique: true
+    required: true,
   },
   deceasedName: String,
   deceasedAddress: String,
@@ -17,6 +18,6 @@ const form100Schema = new mongoose.Schema({
   property: Number,
 }, { timestamps: true });
 
-
+form100Schema.index({ userId: 1, petitionNumber: 1 }, { unique: true });
 const Form100 = mongoose.model("form100", form100Schema);
 module.exports = Form100;

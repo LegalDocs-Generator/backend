@@ -6,10 +6,9 @@ const form101Schema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
-
     petitionNumber: {
       type: String,
-      unique: true
+      required: true,
     },
     deceasedName: String,
     deceasedName1: String,
@@ -28,6 +27,8 @@ const form101Schema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+form101Schema.index({ userId: 1, petitionNumber: 1 }, { unique: true });
 
 const Form101 = mongoose.model("form101", form101Schema);
 

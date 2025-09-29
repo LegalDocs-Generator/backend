@@ -6,7 +6,7 @@ const { generateForm99PDF } = require("../formTemplate/form99");
 const handleGenerateForm99PDF = async (req, res) => {
   try {
     const userId = req.user.id;
-
+    // const { petitionNumber } = req.body || {};
     const formData = await Form99.findOne({ userId });
     if (!formData) {
       return res.status(404).json({
