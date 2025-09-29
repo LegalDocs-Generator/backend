@@ -18,8 +18,8 @@ const handleSendAllFormsToEmail = async (req, res) => {
   try {
     const userId = req.user.id;
     const user = await User.findById(userId);
-    if (!user || !user.email) {
-      return res.status(404).json({ success: false, message: "User or email not found." });
+    if (!user || !user.email || !user.fullName) {
+      return res.status(404).json({ success: false, message: "User or email/fullName not found." });
     }
 
     const forms = [
@@ -36,31 +36,31 @@ const handleSendAllFormsToEmail = async (req, res) => {
 
     for (let i = 0; i < forms.length; i++) {
       const formData = await forms[i].model.findOne({ userId });
-      if (formData) {
-        includedCount++;
-        const html = await forms[i].getHtml(formData);
-
-        if (combinedHtml) {
-          combinedHtml += `<div style="page-break-before: always;"></div>`;
-        }
-        combinedHtml += html;
+      if (!formData) {
+        console.log(`Form ${forms[i].number} not found for user ${userId}, skipping.`);
+        continue; // skip missing forms
       }
+
+      includedCount++;
+      const html = await forms[i].getHtml(formData);
+
+      if (combinedHtml) combinedHtml += `<div style="page-break-before: always;"></div>`;
+      combinedHtml += html;
     }
 
-    if (!combinedHtml) {
-      return res.status(404).json({ success: false, message: "No forms found for user." });
+    if (includedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No forms submitted yet. Please complete the forms before generating PDFs."
+      });
     }
-
 
     const pdfBuffer = await generatePDFfromHTML(combinedHtml);
-
     await sendPdfToUser(user.fullName, user.email, pdfBuffer, `AllForms.pdf`);
-
-    // await Promise.all(forms.map(f => f.model.deleteMany({ userId })));
 
     return res.status(200).json({
       success: true,
-      message: `${includedCount} form(s) combined PDF sent to email and data deleted.`,
+      message: `${includedCount} form(s) combined PDF sent to email.`,
     });
 
   } catch (error) {
@@ -72,5 +72,7 @@ const handleSendAllFormsToEmail = async (req, res) => {
     });
   }
 };
+
+
 
 module.exports = { handleSendAllFormsToEmail };
